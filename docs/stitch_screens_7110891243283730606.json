@@ -1,0 +1,854 @@
+[
+  {
+    "name": "projects/7110891243283730606/screens/12440468434641e5a6c1bc58508fb24e",
+    "title": "Avencis — Business Scale Assessment™ Results Dashboard",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/12894375274123440728",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/12894375274123440728:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/13904883286210259161",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/13904883286210259161:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "10242",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/545bff9e19194977901c102bdcd1b348",
+    "title": "Avencis WFM — Employee Directory",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/545bff9e19194977901c102bdcd1b348/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f513d253ddb0503c2dce61ebb1e:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/545bff9e19194977901c102bdcd1b348/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/545bff9e19194977901c102bdcd1b348:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "2446",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/c4e1b513a6de47d1b0f8885b9afb6183",
+    "title": "Avencis — Standalone Website Footer (Mobile)",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/c4e1b513a6de47d1b0f8885b9afb6183/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065d6aa2e459d1063974836b28d7d7:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/c4e1b513a6de47d1b0f8885b9afb6183/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/c4e1b513a6de47d1b0f8885b9afb6183:download",
+      "mimeType": "text/html"
+    },
+    "width": "780",
+    "height": "3102",
+    "deviceType": "MOBILE"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/3676743727468905295",
+    "title": "image.png",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/3676743727468906648",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/3676743727468906648:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {},
+    "width": "405",
+    "height": "163"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/32707b9b27dd4ec6b9134a0e8a2839af",
+    "title": "Avencis WFM — Legal Entities Management",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/32707b9b27dd4ec6b9134a0e8a2839af/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f51501b1a9b022d45ab6131814e:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/32707b9b27dd4ec6b9134a0e8a2839af/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/32707b9b27dd4ec6b9134a0e8a2839af:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "3428",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/5fccb2c4d9744010b8e66a891cdcf9f4",
+    "title": "Avencis WFM — Attendance & Leave Reports Ledger",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/5fccb2c4d9744010b8e66a891cdcf9f4/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f51f202c874022d4efed22750cd:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/5fccb2c4d9744010b8e66a891cdcf9f4/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/5fccb2c4d9744010b8e66a891cdcf9f4:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "5136",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/570ed7d798de485686a608552e94c93a",
+    "title": "Avencis WFM — Organisation Settings & Profile",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/7362230063940626640",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/7362230063940626640:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/159610976656760948",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/159610976656760948:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "4224",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/4dcc6203c6754e36ab749fd86d2a07df",
+    "title": "Avencis WFM — Users & Access Control Dashboard",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/4dcc6203c6754e36ab749fd86d2a07df/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f51ace0ff14022d4efed22750cd:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/4dcc6203c6754e36ab749fd86d2a07df/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/4dcc6203c6754e36ab749fd86d2a07df:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "5884",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/a5efb687978d407e8221ec6967237321",
+    "title": "Avencis — Business Scale Assessment™ Diagnostic",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/3976904579622210704",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/3976904579622210704:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/8274549371840227571",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/8274549371840227571:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "8420",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/d05e1024b8064726b9d3b07cbd365491",
+    "title": "Avencis — The Five Business Engines",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/17524550390365602434",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/17524550390365602434:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/17788161494730105422",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/17788161494730105422:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "9090",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/23762675765648859b41d4cbebc24bb2",
+    "title": "Avencis — Standalone Website Footer",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/23762675765648859b41d4cbebc24bb2/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065d41b4321196033858e936126efe:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/23762675765648859b41d4cbebc24bb2/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/23762675765648859b41d4cbebc24bb2:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "2048",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/decf582b72b7450aa3a92997676fdc5c",
+    "title": "Avencis — Business Stages & Who We Work With",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/13894041954071734227",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/13894041954071734227:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/11848435328900757397",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/11848435328900757397:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "7588",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/d22afe6263f149ffbbe5f339f451faa1",
+    "title": "Avencis WFM — Leave Management Dashboard",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/d22afe6263f149ffbbe5f339f451faa1/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f5191c4dc970503c1bbc504a561:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/d22afe6263f149ffbbe5f339f451faa1/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/d22afe6263f149ffbbe5f339f451faa1:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "5272",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/53ff5859ce064bbc96dd1fabe7403b10",
+    "title": "Avencis — Your Extended Management Team",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/12355763808888266138",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/12355763808888266138:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/12605847372318241551",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/12605847372318241551:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "11220",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/74b3433a442e4b5387171512fcaad688",
+    "title": "Avencis WFM — Enterprise Login",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/74b3433a442e4b5387171512fcaad688/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f51311c4b4307c4ecb6f6380f44:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/74b3433a442e4b5387171512fcaad688/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/74b3433a442e4b5387171512fcaad688:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "2048",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/e06787e84bbf48f7a55fc6644a90af48",
+    "title": "Avencis — Selected Transformations (Case Studies)",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/4641735991940574269",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/4641735991940574269:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/13220677389817291020",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/13220677389817291020:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "11904",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/4f1d5879d9ac4234afcfa38886e250e0",
+    "title": "Avencis WFM — Employees & Directory",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/14723818081164830095",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/14723818081164830095:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/17216403473310886271",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/17216403473310886271:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "3502",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/a76fd6e70be846359cd572238883e671",
+    "title": "Avencis WFM — Client Directory",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/a76fd6e70be846359cd572238883e671/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f515091175e057601a13d34860a:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/a76fd6e70be846359cd572238883e671/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/a76fd6e70be846359cd572238883e671:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "4412",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/839a4e44dc1b4da783c1204967fbc061",
+    "title": "Avencis — The Promise & Final Conversion",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/2881724772213961989",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/2881724772213961989:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/10861413167382723338",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/10861413167382723338:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "11970",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/c9d381730a8b4f14a07d43267ca1714f",
+    "title": "Avencis WFM — Individual Payslip Preview & Official Template",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/4332525396238308536",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/4332525396238308536:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/8204369438769726898",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/8204369438769726898:download",
+      "mimeType": "text/html"
+    },
+    "width": "3328",
+    "height": "3252",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/7a96a9f854444039b29f6e45b401b562",
+    "title": "Avencis WFM — Security Audit Logs & Governance Ledger",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/1112902777238720677",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/1112902777238720677:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/6174295905609844401",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/6174295905609844401:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "4978",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/997c3ec2b01c4611b728d6a15f811c37",
+    "title": "Avencis Founder's Day — Mobile Experience",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/14219058048466943866",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/14219058048466943866:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/5730670211748703289",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/5730670211748703289:download",
+      "mimeType": "text/html"
+    },
+    "width": "780",
+    "height": "4366",
+    "deviceType": "MOBILE"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/e3f1bdb7a4b04437b0bfaccdcd420b79",
+    "title": "Avencis Founder's Day — Mobile Story Experience",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/822298301942702222",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/822298301942702222:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/5767186041633940884",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/5767186041633940884:download",
+      "mimeType": "text/html"
+    },
+    "width": "780",
+    "height": "3016",
+    "deviceType": "MOBILE"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/5e0b0a0aa90449ddb33023f1c350668e",
+    "title": "Avencis WFM — Payslip Management Dashboard",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/5e0b0a0aa90449ddb33023f1c350668e/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f51a2ae378605c2fe84563bdf13:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/5e0b0a0aa90449ddb33023f1c350668e/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/5e0b0a0aa90449ddb33023f1c350668e:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "4864",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/b808814eaec44fdfa2d3399ba36debac",
+    "title": "Avencis WFM — Employee Profile: Personal Information",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/b808814eaec44fdfa2d3399ba36debac/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f513dd7856b00b754dddb170c2d:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/b808814eaec44fdfa2d3399ba36debac/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/b808814eaec44fdfa2d3399ba36debac:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "5796",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/b48bf0b9951b4c9e8b8a546fbab4b8a8",
+    "title": "Avencis WFM — Payroll Run & Processing",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/5127843553575737781",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/5127843553575737781:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/6295973979293509585",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/6295973979293509585:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "4064",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/fa1fd6f261104f8d9f5ed56c2382c467",
+    "title": "Avencis WFM — Application Shell & System Architecture",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/fa1fd6f261104f8d9f5ed56c2382c467/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f5132dc59930503c1bbc504a561:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/fa1fd6f261104f8d9f5ed56c2382c467/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/fa1fd6f261104f8d9f5ed56c2382c467:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "6446",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/94b68f1b56334b9e8c1452f76cfb872a",
+    "title": "Avencis — How We Work: The 6-Stage Operating Methodology",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/17035736767724905396",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/17035736767724905396:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/12258581955041916957",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/12258581955041916957:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "18236",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/395c86334fbc4762b120aa2db036efde",
+    "title": "Avencis WFM — Payroll Management Dashboard",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/16957480111854086574",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/16957480111854086574:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/2675078721916230184",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/2675078721916230184:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "7192",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/596118be77bc46749f560d574913b8ae",
+    "title": "Avencis Founder's Day — Mobile Responsive Experience",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/11857578259675448096",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/11857578259675448096:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/3570174631247145242",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/3570174631247145242:download",
+      "mimeType": "text/html"
+    },
+    "width": "780",
+    "height": "6786",
+    "deviceType": "MOBILE"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/f9060ce22976423c98b26785f77162c9",
+    "title": "Avencis — What Avencis Actually Does",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/8889404396790514913",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/8889404396790514913:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/11610552464974063702",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/11610552464974063702:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "8230",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/ec7d8ecc60c7453bbb051582ea9a71b7",
+    "title": "Avencis WFM — Attendance Overview & Command Dashboard",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/ec7d8ecc60c7453bbb051582ea9a71b7/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f518884adf7057601a13d34860a:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/ec7d8ecc60c7453bbb051582ea9a71b7/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/ec7d8ecc60c7453bbb051582ea9a71b7:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "6518",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/fc8c55816aaa4a1d86826e6af994541a",
+    "title": "Avencis WFM — Organisation Admin Dashboard",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/fc8c55816aaa4a1d86826e6af994541a/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f5133390a2904eaa7456808b32c:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/fc8c55816aaa4a1d86826e6af994541a/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/fc8c55816aaa4a1d86826e6af994541a:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "5078",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/015277d5045549818051ece4e5dc2f84",
+    "title": "Avencis WFM — Organisation Overview",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/015277d5045549818051ece4e5dc2f84/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f51502af6f307c4c94e6b1738a5:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/015277d5045549818051ece4e5dc2f84/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/015277d5045549818051ece4e5dc2f84:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "5152",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/e16e6a95e8cd470c81eece3434043f36",
+    "title": "Avencis WFM — Employee Profile: Overview",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/e16e6a95e8cd470c81eece3434043f36/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f513d525e5b091050963239d0e7:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/e16e6a95e8cd470c81eece3434043f36/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/e16e6a95e8cd470c81eece3434043f36:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "2916",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/10842625070303861142",
+    "title": "LOGO1.png",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/10842625070303861367",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/10842625070303861367:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {},
+    "width": "549",
+    "height": "151"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/5b6ebcb2f0ae494d97d414304bbf5b37",
+    "title": "Avencis Founder's Day — Desktop Homepage",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/12990937081933132279",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/12990937081933132279:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/12393043336725580124",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/12393043336725580124:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "3650",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/1ad3c83327e94a218b586619534d6f0f",
+    "title": "Avencis WFM — Leave Application Register",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/1ad3c83327e94a218b586619534d6f0f/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f51931fefb0022d4efed22750cd:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/1ad3c83327e94a218b586619534d6f0f/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/1ad3c83327e94a218b586619534d6f0f:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "4378",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/e0e4d86fb6014df3ab7ebc85e99dd416",
+    "title": "Avencis WFM — Enterprise Permission Matrix",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/e0e4d86fb6014df3ab7ebc85e99dd416/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f51ab68b2b8091050963239d0e7:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/e0e4d86fb6014df3ab7ebc85e99dd416/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/e0e4d86fb6014df3ab7ebc85e99dd416:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "5842",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/5748070f841848ea9afc95304c090b16",
+    "title": "Avencis WFM — Attendance Regularisations & Exception Ledger",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/5748070f841848ea9afc95304c090b16/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f5187bb3373022d4efed22750cd:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/5748070f841848ea9afc95304c090b16/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/5748070f841848ea9afc95304c090b16:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "5650",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/e90ca6a75bc34ffeb591065e106a9911",
+    "title": "Avencis WFM — Payroll Run & Guided Processing",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/10979108394086596642",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/10979108394086596642:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/2464536207224201520",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/2464536207224201520:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "7170",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/a32a291c6c1d4dc5b4ee5fa651f22a02",
+    "title": "Avencis — Revenue Is Only The Surface",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/17301047738730943410",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/17301047738730943410:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/7400301446018154904",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/7400301446018154904:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "9628",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/d80109c1221c46798fd55593db1275eb",
+    "title": "Avencis WFM — Executive Workforce Overview",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/10720145395010782908",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/10720145395010782908:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/14160954819629693990",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/14160954819629693990:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "4504",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/71a0521667a7483f99f281fb4ae88047",
+    "title": "Avencis WFM — Notifications & User Profile Overlays",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/71a0521667a7483f99f281fb4ae88047/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f5132798919053b7927582f876d:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/71a0521667a7483f99f281fb4ae88047/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/71a0521667a7483f99f281fb4ae88047:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "2048",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/54a9c26fab1641fcbb72183c0156cbb4",
+    "title": "Avencis WFM — Add New Employee",
+    "screenshot": {
+      "name": "projects/7110891243283730606/screens/54a9c26fab1641fcbb72183c0156cbb4/fileEntries/screenshot",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/screenshot_00065f513eb2acf1053b7927582f876d:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/screens/54a9c26fab1641fcbb72183c0156cbb4/fileEntries/html",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/54a9c26fab1641fcbb72183c0156cbb4:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "8264",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/55b51c7caa4a44299faae4df84964a9f",
+    "title": "Avencis WFM — Daily Attendance & GPS Verification",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/11330844702513304904",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/11330844702513304904:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/7660140844605359332",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/7660140844605359332:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "3846",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/3113608216660100725",
+    "title": "LOGO.png",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/3113608216660100286",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/3113608216660100286:download",
+      "mimeType": "image/png"
+    },
+    "htmlCode": {},
+    "width": "2048",
+    "height": "2048"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/b61f6f92c7664eb597fc52d337214daa",
+    "title": "Avencis — Growth vs. Scaling Diagnostic",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/6623217242115986472",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/6623217242115986472:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/16713689345824032332",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/16713689345824032332:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "9126",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/6e882b45a0684513869d482ced55729a",
+    "title": "Avencis WFM — Reports & Analytics Dashboard",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/8964561966854131582",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/8964561966854131582:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/444729134147717775",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/444729134147717775:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "6620",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/8fc69ae7fd7a487ea7895419ca72c342",
+    "title": "Avencis — Why Avencis Is Different",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/1818006903619701136",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/1818006903619701136:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/9158067043771814352",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/9158067043771814352:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "7844",
+    "deviceType": "DESKTOP"
+  },
+  {
+    "name": "projects/7110891243283730606/screens/bd70dde61c7c4c4fabf2afc96b1d3581",
+    "title": "Avencis — Founder Dependency: The 7-Day Disconnect Diagnostic",
+    "screenshot": {
+      "name": "projects/7110891243283730606/files/9863047409194415285",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/9863047409194415285:download",
+      "mimeType": "image/jpeg"
+    },
+    "htmlCode": {
+      "name": "projects/7110891243283730606/files/15359729927585056617",
+      "downloadUrl": "https://stitch.googleapis.com/v1/projects/7110891243283730606/files/15359729927585056617:download",
+      "mimeType": "text/html"
+    },
+    "width": "2560",
+    "height": "11250",
+    "deviceType": "DESKTOP"
+  }
+]

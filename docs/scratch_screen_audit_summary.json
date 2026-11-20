@@ -1,0 +1,1361 @@
+[
+  {
+    "batch": "batch-01",
+    "batchIndex": 1,
+    "folder": "01-employees-directory",
+    "name": "Avencis WFM — Employees & Directory",
+    "id": "4f1d5879d9ac4234afcfa38886e250e0",
+    "status": "SUCCESS",
+    "assetCount": 3,
+    "device": "DESKTOP",
+    "dimensions": "2560x3502",
+    "manifestEntry": {
+      "screenIndex": "01",
+      "screenFolder": "01-employees-directory",
+      "screenName": "Avencis WFM — Employees & Directory",
+      "originalStitchScreenId": "4f1d5879d9ac4234afcfa38886e250e0",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x3502",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/01-employees-directory/screen-code.original.html",
+        "screens/01-employees-directory/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/01-employees-directory/assets/screen-preview.jpg",
+        "screens/01-employees-directory/assets/asset-01.png",
+        "screens/01-employees-directory/assets/asset-02.png"
+      ],
+      "numberOfAssets": 3,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 54953,
+      "hasOrig": true,
+      "origSize": 56095,
+      "assetFilesCount": 3,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 2,
+    "folder": "02-executive-workforce-overview",
+    "name": "Avencis WFM — Executive Workforce Overview",
+    "id": "d80109c1221c46798fd55593db1275eb",
+    "status": "SUCCESS",
+    "assetCount": 3,
+    "device": "DESKTOP",
+    "dimensions": "2560x4504",
+    "manifestEntry": {
+      "screenIndex": "02",
+      "screenFolder": "02-executive-workforce-overview",
+      "screenName": "Avencis WFM — Executive Workforce Overview",
+      "originalStitchScreenId": "d80109c1221c46798fd55593db1275eb",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x4504",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/02-executive-workforce-overview/screen-code.original.html",
+        "screens/02-executive-workforce-overview/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/02-executive-workforce-overview/assets/screen-preview.jpg",
+        "screens/02-executive-workforce-overview/assets/asset-01.png",
+        "screens/02-executive-workforce-overview/assets/asset-02.png"
+      ],
+      "numberOfAssets": 3,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 57016,
+      "hasOrig": true,
+      "origSize": 58158,
+      "assetFilesCount": 3,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 3,
+    "folder": "03-daily-attendance-gps",
+    "name": "Avencis WFM — Daily Attendance & GPS Verification",
+    "id": "55b51c7caa4a44299faae4df84964a9f",
+    "status": "SUCCESS",
+    "assetCount": 5,
+    "device": "DESKTOP",
+    "dimensions": "2560x3846",
+    "manifestEntry": {
+      "screenIndex": "03",
+      "screenFolder": "03-daily-attendance-gps",
+      "screenName": "Avencis WFM — Daily Attendance & GPS Verification",
+      "originalStitchScreenId": "55b51c7caa4a44299faae4df84964a9f",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x3846",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/03-daily-attendance-gps/screen-code.original.html",
+        "screens/03-daily-attendance-gps/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/03-daily-attendance-gps/assets/screen-preview.jpg",
+        "screens/03-daily-attendance-gps/assets/asset-01.png",
+        "screens/03-daily-attendance-gps/assets/asset-02.png",
+        "screens/03-daily-attendance-gps/assets/asset-03.png",
+        "screens/03-daily-attendance-gps/assets/asset-04.png"
+      ],
+      "numberOfAssets": 5,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 57459,
+      "hasOrig": true,
+      "origSize": 58854,
+      "assetFilesCount": 5,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 4,
+    "folder": "04-notifications-user-profile",
+    "name": "Avencis WFM — Notifications & User Profile Overlays",
+    "id": "71a0521667a7483f99f281fb4ae88047",
+    "status": "SUCCESS",
+    "assetCount": 4,
+    "device": "DESKTOP",
+    "dimensions": "2560x2048",
+    "manifestEntry": {
+      "screenIndex": "04",
+      "screenFolder": "04-notifications-user-profile",
+      "screenName": "Avencis WFM — Notifications & User Profile Overlays",
+      "originalStitchScreenId": "71a0521667a7483f99f281fb4ae88047",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x2048",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/04-notifications-user-profile/screen-code.original.html",
+        "screens/04-notifications-user-profile/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/04-notifications-user-profile/assets/screen-preview.png",
+        "screens/04-notifications-user-profile/assets/asset-01.png",
+        "screens/04-notifications-user-profile/assets/asset-02.jpg",
+        "screens/04-notifications-user-profile/assets/asset-03.jpg"
+      ],
+      "numberOfAssets": 4,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 43093,
+      "hasOrig": true,
+      "origSize": 43917,
+      "assetFilesCount": 4,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": false,
+      "hasForm": true,
+      "hasModal": true
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 5,
+    "folder": "05-enterprise-login",
+    "name": "Avencis WFM — Enterprise Login",
+    "id": "74b3433a442e4b5387171512fcaad688",
+    "status": "SUCCESS",
+    "assetCount": 3,
+    "device": "DESKTOP",
+    "dimensions": "2560x2048",
+    "manifestEntry": {
+      "screenIndex": "05",
+      "screenFolder": "05-enterprise-login",
+      "screenName": "Avencis WFM — Enterprise Login",
+      "originalStitchScreenId": "74b3433a442e4b5387171512fcaad688",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x2048",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/05-enterprise-login/screen-code.original.html",
+        "screens/05-enterprise-login/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/05-enterprise-login/assets/screen-preview.png",
+        "screens/05-enterprise-login/assets/asset-01.png",
+        "screens/05-enterprise-login/assets/asset-02.png"
+      ],
+      "numberOfAssets": 3,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 14322,
+      "hasOrig": true,
+      "origSize": 14880,
+      "assetFilesCount": 3,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": false,
+      "hasHeader": true,
+      "hasTable": false,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 6,
+    "folder": "06-payroll-processing",
+    "name": "Avencis WFM — Payroll Run & Processing",
+    "id": "b48bf0b9951b4c9e8b8a546fbab4b8a8",
+    "status": "SUCCESS",
+    "assetCount": 2,
+    "device": "DESKTOP",
+    "dimensions": "2560x4064",
+    "manifestEntry": {
+      "screenIndex": "06",
+      "screenFolder": "06-payroll-processing",
+      "screenName": "Avencis WFM — Payroll Run & Processing",
+      "originalStitchScreenId": "b48bf0b9951b4c9e8b8a546fbab4b8a8",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x4064",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/06-payroll-processing/screen-code.original.html",
+        "screens/06-payroll-processing/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/06-payroll-processing/assets/screen-preview.jpg",
+        "screens/06-payroll-processing/assets/asset-01.png"
+      ],
+      "numberOfAssets": 2,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 47373,
+      "hasOrig": true,
+      "origSize": 47957,
+      "assetFilesCount": 2,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 7,
+    "folder": "07-application-shell",
+    "name": "Avencis WFM — Application Shell & System Architecture",
+    "id": "fa1fd6f261104f8d9f5ed56c2382c467",
+    "status": "SUCCESS",
+    "assetCount": 4,
+    "device": "DESKTOP",
+    "dimensions": "2560x6446",
+    "manifestEntry": {
+      "screenIndex": "07",
+      "screenFolder": "07-application-shell",
+      "screenName": "Avencis WFM — Application Shell & System Architecture",
+      "originalStitchScreenId": "fa1fd6f261104f8d9f5ed56c2382c467",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x6446",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/07-application-shell/screen-code.original.html",
+        "screens/07-application-shell/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/07-application-shell/assets/screen-preview.png",
+        "screens/07-application-shell/assets/asset-01.png",
+        "screens/07-application-shell/assets/asset-02.jpg",
+        "screens/07-application-shell/assets/asset-03.jpg"
+      ],
+      "numberOfAssets": 4,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 46532,
+      "hasOrig": true,
+      "origSize": 47356,
+      "assetFilesCount": 4,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 8,
+    "folder": "08-organisation-admin-dashboard",
+    "name": "Avencis WFM — Organisation Admin Dashboard",
+    "id": "fc8c55816aaa4a1d86826e6af994541a",
+    "status": "SUCCESS",
+    "assetCount": 2,
+    "device": "DESKTOP",
+    "dimensions": "2560x5078",
+    "manifestEntry": {
+      "screenIndex": "08",
+      "screenFolder": "08-organisation-admin-dashboard",
+      "screenName": "Avencis WFM — Organisation Admin Dashboard",
+      "originalStitchScreenId": "fc8c55816aaa4a1d86826e6af994541a",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x5078",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/08-organisation-admin-dashboard/screen-code.original.html",
+        "screens/08-organisation-admin-dashboard/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/08-organisation-admin-dashboard/assets/screen-preview.png",
+        "screens/08-organisation-admin-dashboard/assets/asset-01.png"
+      ],
+      "numberOfAssets": 2,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 55384,
+      "hasOrig": true,
+      "origSize": 55676,
+      "assetFilesCount": 2,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": false,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 9,
+    "folder": "09-organisation-overview",
+    "name": "Avencis WFM — Organisation Overview",
+    "id": "015277d5045549818051ece4e5dc2f84",
+    "status": "SUCCESS",
+    "assetCount": 3,
+    "device": "DESKTOP",
+    "dimensions": "2560x5152",
+    "manifestEntry": {
+      "screenIndex": "09",
+      "screenFolder": "09-organisation-overview",
+      "screenName": "Avencis WFM — Organisation Overview",
+      "originalStitchScreenId": "015277d5045549818051ece4e5dc2f84",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x5152",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/09-organisation-overview/screen-code.original.html",
+        "screens/09-organisation-overview/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/09-organisation-overview/assets/screen-preview.png",
+        "screens/09-organisation-overview/assets/asset-01.png",
+        "screens/09-organisation-overview/assets/asset-02.jpg"
+      ],
+      "numberOfAssets": 3,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 47787,
+      "hasOrig": true,
+      "origSize": 48345,
+      "assetFilesCount": 3,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": false,
+      "hasForm": true,
+      "hasModal": true
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 10,
+    "folder": "10-legal-entities",
+    "name": "Avencis WFM — Legal Entities Management",
+    "id": "32707b9b27dd4ec6b9134a0e8a2839af",
+    "status": "SUCCESS",
+    "assetCount": 2,
+    "device": "DESKTOP",
+    "dimensions": "2560x3428",
+    "manifestEntry": {
+      "screenIndex": "10",
+      "screenFolder": "10-legal-entities",
+      "screenName": "Avencis WFM — Legal Entities Management",
+      "originalStitchScreenId": "32707b9b27dd4ec6b9134a0e8a2839af",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x3428",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/10-legal-entities/screen-code.original.html",
+        "screens/10-legal-entities/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/10-legal-entities/assets/screen-preview.png",
+        "screens/10-legal-entities/assets/asset-01.png"
+      ],
+      "numberOfAssets": 2,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 44923,
+      "hasOrig": true,
+      "origSize": 45215,
+      "assetFilesCount": 2,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 11,
+    "folder": "11-add-employee",
+    "name": "Avencis WFM — Add New Employee",
+    "id": "54a9c26fab1641fcbb72183c0156cbb4",
+    "status": "SUCCESS",
+    "assetCount": 4,
+    "device": "DESKTOP",
+    "dimensions": "2560x8264",
+    "manifestEntry": {
+      "screenIndex": "11",
+      "screenFolder": "11-add-employee",
+      "screenName": "Avencis WFM — Add New Employee",
+      "originalStitchScreenId": "54a9c26fab1641fcbb72183c0156cbb4",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x8264",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/11-add-employee/screen-code.original.html",
+        "screens/11-add-employee/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/11-add-employee/assets/screen-preview.png",
+        "screens/11-add-employee/assets/asset-01.png",
+        "screens/11-add-employee/assets/asset-02.jpg",
+        "screens/11-add-employee/assets/asset-03.jpg"
+      ],
+      "numberOfAssets": 4,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 58666,
+      "hasOrig": true,
+      "origSize": 59490,
+      "assetFilesCount": 4,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": false,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 12,
+    "folder": "12-client-directory",
+    "name": "Avencis WFM — Client Directory",
+    "id": "a76fd6e70be846359cd572238883e671",
+    "status": "SUCCESS",
+    "assetCount": 6,
+    "device": "DESKTOP",
+    "dimensions": "2560x4412",
+    "manifestEntry": {
+      "screenIndex": "12",
+      "screenFolder": "12-client-directory",
+      "screenName": "Avencis WFM — Client Directory",
+      "originalStitchScreenId": "a76fd6e70be846359cd572238883e671",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x4412",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/12-client-directory/screen-code.original.html",
+        "screens/12-client-directory/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/12-client-directory/assets/screen-preview.png",
+        "screens/12-client-directory/assets/asset-01.png",
+        "screens/12-client-directory/assets/asset-02.jpg",
+        "screens/12-client-directory/assets/asset-03.jpg",
+        "screens/12-client-directory/assets/asset-04.jpg",
+        "screens/12-client-directory/assets/asset-05.jpg"
+      ],
+      "numberOfAssets": 6,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 52280,
+      "hasOrig": true,
+      "origSize": 53636,
+      "assetFilesCount": 6,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 13,
+    "folder": "13-employee-personal-information",
+    "name": "Avencis WFM — Employee Profile: Personal Information",
+    "id": "b808814eaec44fdfa2d3399ba36debac",
+    "status": "SUCCESS",
+    "assetCount": 4,
+    "device": "DESKTOP",
+    "dimensions": "2560x5796",
+    "manifestEntry": {
+      "screenIndex": "13",
+      "screenFolder": "13-employee-personal-information",
+      "screenName": "Avencis WFM — Employee Profile: Personal Information",
+      "originalStitchScreenId": "b808814eaec44fdfa2d3399ba36debac",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x5796",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/13-employee-personal-information/screen-code.original.html",
+        "screens/13-employee-personal-information/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/13-employee-personal-information/assets/screen-preview.png",
+        "screens/13-employee-personal-information/assets/asset-01.png",
+        "screens/13-employee-personal-information/assets/asset-02.jpg",
+        "screens/13-employee-personal-information/assets/asset-03.png"
+      ],
+      "numberOfAssets": 4,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 48471,
+      "hasOrig": true,
+      "origSize": 49295,
+      "assetFilesCount": 4,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": false,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 14,
+    "folder": "14-employee-profile-overview",
+    "name": "Avencis WFM — Employee Profile: Overview",
+    "id": "e16e6a95e8cd470c81eece3434043f36",
+    "status": "SUCCESS",
+    "assetCount": 3,
+    "device": "DESKTOP",
+    "dimensions": "2560x2916",
+    "manifestEntry": {
+      "screenIndex": "14",
+      "screenFolder": "14-employee-profile-overview",
+      "screenName": "Avencis WFM — Employee Profile: Overview",
+      "originalStitchScreenId": "e16e6a95e8cd470c81eece3434043f36",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x2916",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/14-employee-profile-overview/screen-code.original.html",
+        "screens/14-employee-profile-overview/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/14-employee-profile-overview/assets/screen-preview.png",
+        "screens/14-employee-profile-overview/assets/asset-01.png",
+        "screens/14-employee-profile-overview/assets/asset-02.jpg"
+      ],
+      "numberOfAssets": 3,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 46028,
+      "hasOrig": true,
+      "origSize": 46586,
+      "assetFilesCount": 3,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": false,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-01",
+    "batchIndex": 15,
+    "folder": "15-employee-directory",
+    "name": "Avencis WFM — Employee Directory",
+    "id": "545bff9e19194977901c102bdcd1b348",
+    "status": "SUCCESS",
+    "assetCount": 2,
+    "device": "DESKTOP",
+    "dimensions": "2560x2446",
+    "manifestEntry": {
+      "screenIndex": "15",
+      "screenFolder": "15-employee-directory",
+      "screenName": "Avencis WFM — Employee Directory",
+      "originalStitchScreenId": "545bff9e19194977901c102bdcd1b348",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x2446",
+      "exportStatus": "SUCCESS",
+      "codeFilePaths": [
+        "screens/15-employee-directory/screen-code.original.html",
+        "screens/15-employee-directory/screen-code.html"
+      ],
+      "downloadedAssetPaths": [
+        "screens/15-employee-directory/assets/screen-preview.png",
+        "screens/15-employee-directory/assets/asset-01.png"
+      ],
+      "numberOfAssets": 2,
+      "missingOrFailedDownloads": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 49026,
+      "hasOrig": true,
+      "origSize": 49318,
+      "assetFilesCount": 2,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 1,
+    "folder": "01-attendance-command-dashboard",
+    "name": "Avencis WFM — Attendance Overview & Command Dashboard",
+    "id": "ec7d8ecc60c7453bbb051582ea9a71b7",
+    "status": "SUCCESS",
+    "assetCount": 3,
+    "device": "DESKTOP",
+    "dimensions": "2560x6518",
+    "manifestEntry": {
+      "screenNumber": "01",
+      "screenFolder": "01-attendance-command-dashboard",
+      "screenName": "Avencis WFM — Attendance Overview & Command Dashboard",
+      "originalStitchScreenId": "ec7d8ecc60c7453bbb051582ea9a71b7",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x6518",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/01-attendance-command-dashboard/screen-code.original.html",
+        "screens/01-attendance-command-dashboard/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/01-attendance-command-dashboard/assets/screen-preview.png",
+        "screens/01-attendance-command-dashboard/assets/asset-01.png",
+        "screens/01-attendance-command-dashboard/assets/asset-02.png"
+      ],
+      "assetCount": 3,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 57453,
+      "hasOrig": true,
+      "origSize": 58316,
+      "assetFilesCount": 3,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 2,
+    "folder": "02-leave-application-register",
+    "name": "Avencis WFM — Leave Application Register",
+    "id": "1ad3c83327e94a218b586619534d6f0f",
+    "status": "SUCCESS",
+    "assetCount": 8,
+    "device": "DESKTOP",
+    "dimensions": "2560x4378",
+    "manifestEntry": {
+      "screenNumber": "02",
+      "screenFolder": "02-leave-application-register",
+      "screenName": "Avencis WFM — Leave Application Register",
+      "originalStitchScreenId": "1ad3c83327e94a218b586619534d6f0f",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x4378",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/02-leave-application-register/screen-code.original.html",
+        "screens/02-leave-application-register/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/02-leave-application-register/assets/screen-preview.png",
+        "screens/02-leave-application-register/assets/asset-01.png",
+        "screens/02-leave-application-register/assets/asset-02.jpg",
+        "screens/02-leave-application-register/assets/asset-03.jpg",
+        "screens/02-leave-application-register/assets/asset-04.jpg",
+        "screens/02-leave-application-register/assets/asset-05.jpg",
+        "screens/02-leave-application-register/assets/asset-06.jpg",
+        "screens/02-leave-application-register/assets/asset-07.jpg"
+      ],
+      "assetCount": 8,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 56128,
+      "hasOrig": true,
+      "origSize": 58016,
+      "assetFilesCount": 8,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 3,
+    "folder": "03-payroll-management-dashboard",
+    "name": "Avencis WFM — Payroll Management Dashboard",
+    "id": "395c86334fbc4762b120aa2db036efde",
+    "status": "SUCCESS",
+    "assetCount": 1,
+    "device": "DESKTOP",
+    "dimensions": "2560x7192",
+    "manifestEntry": {
+      "screenNumber": "03",
+      "screenFolder": "03-payroll-management-dashboard",
+      "screenName": "Avencis WFM — Payroll Management Dashboard",
+      "originalStitchScreenId": "395c86334fbc4762b120aa2db036efde",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x7192",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/03-payroll-management-dashboard/screen-code.original.html",
+        "screens/03-payroll-management-dashboard/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/03-payroll-management-dashboard/assets/screen-preview.jpg"
+      ],
+      "assetCount": 1,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 52423,
+      "hasOrig": true,
+      "origSize": 52423,
+      "assetFilesCount": 1,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 4,
+    "folder": "04-attendance-regularisations",
+    "name": "Avencis WFM — Attendance Regularisations & Exception Ledger",
+    "id": "5748070f841848ea9afc95304c090b16",
+    "status": "SUCCESS",
+    "assetCount": 4,
+    "device": "DESKTOP",
+    "dimensions": "2560x5650",
+    "manifestEntry": {
+      "screenNumber": "04",
+      "screenFolder": "04-attendance-regularisations",
+      "screenName": "Avencis WFM — Attendance Regularisations & Exception Ledger",
+      "originalStitchScreenId": "5748070f841848ea9afc95304c090b16",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x5650",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/04-attendance-regularisations/screen-code.original.html",
+        "screens/04-attendance-regularisations/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/04-attendance-regularisations/assets/screen-preview.png",
+        "screens/04-attendance-regularisations/assets/asset-01.png",
+        "screens/04-attendance-regularisations/assets/asset-02.png",
+        "screens/04-attendance-regularisations/assets/asset-03.jpg"
+      ],
+      "assetCount": 4,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 52930,
+      "hasOrig": true,
+      "origSize": 54059,
+      "assetFilesCount": 4,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 5,
+    "folder": "05-leave-management-dashboard",
+    "name": "Avencis WFM — Leave Management Dashboard",
+    "id": "d22afe6263f149ffbbe5f339f451faa1",
+    "status": "SUCCESS",
+    "assetCount": 2,
+    "device": "DESKTOP",
+    "dimensions": "2560x5272",
+    "manifestEntry": {
+      "screenNumber": "05",
+      "screenFolder": "05-leave-management-dashboard",
+      "screenName": "Avencis WFM — Leave Management Dashboard",
+      "originalStitchScreenId": "d22afe6263f149ffbbe5f339f451faa1",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x5272",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/05-leave-management-dashboard/screen-code.original.html",
+        "screens/05-leave-management-dashboard/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/05-leave-management-dashboard/assets/screen-preview.png",
+        "screens/05-leave-management-dashboard/assets/asset-01.png"
+      ],
+      "assetCount": 2,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 48066,
+      "hasOrig": true,
+      "origSize": 48358,
+      "assetFilesCount": 2,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": false,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 6,
+    "folder": "06-payroll-guided-processing",
+    "name": "Avencis WFM — Payroll Run & Guided Processing",
+    "id": "e90ca6a75bc34ffeb591065e106a9911",
+    "status": "SUCCESS",
+    "assetCount": 1,
+    "device": "DESKTOP",
+    "dimensions": "2560x7170",
+    "manifestEntry": {
+      "screenNumber": "06",
+      "screenFolder": "06-payroll-guided-processing",
+      "screenName": "Avencis WFM — Payroll Run & Guided Processing",
+      "originalStitchScreenId": "e90ca6a75bc34ffeb591065e106a9911",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x7170",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/06-payroll-guided-processing/screen-code.original.html",
+        "screens/06-payroll-guided-processing/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/06-payroll-guided-processing/assets/screen-preview.jpg"
+      ],
+      "assetCount": 1,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 49342,
+      "hasOrig": true,
+      "origSize": 49342,
+      "assetFilesCount": 1,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 7,
+    "folder": "07-payslip-management",
+    "name": "Avencis WFM — Payslip Management Dashboard",
+    "id": "5e0b0a0aa90449ddb33023f1c350668e",
+    "status": "SUCCESS",
+    "assetCount": 1,
+    "device": "DESKTOP",
+    "dimensions": "2560x4864",
+    "manifestEntry": {
+      "screenNumber": "07",
+      "screenFolder": "07-payslip-management",
+      "screenName": "Avencis WFM — Payslip Management Dashboard",
+      "originalStitchScreenId": "5e0b0a0aa90449ddb33023f1c350668e",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x4864",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/07-payslip-management/screen-code.original.html",
+        "screens/07-payslip-management/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/07-payslip-management/assets/screen-preview.png"
+      ],
+      "assetCount": 1,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 58836,
+      "hasOrig": true,
+      "origSize": 58836,
+      "assetFilesCount": 1,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 8,
+    "folder": "08-individual-payslip-preview",
+    "name": "Avencis WFM — Individual Payslip Preview & Official Template",
+    "id": "c9d381730a8b4f14a07d43267ca1714f",
+    "status": "SUCCESS",
+    "assetCount": 1,
+    "device": "DESKTOP",
+    "dimensions": "3328x3252",
+    "manifestEntry": {
+      "screenNumber": "08",
+      "screenFolder": "08-individual-payslip-preview",
+      "screenName": "Avencis WFM — Individual Payslip Preview & Official Template",
+      "originalStitchScreenId": "c9d381730a8b4f14a07d43267ca1714f",
+      "deviceType": "DESKTOP",
+      "dimensions": "3328x3252",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/08-individual-payslip-preview/screen-code.original.html",
+        "screens/08-individual-payslip-preview/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/08-individual-payslip-preview/assets/screen-preview.jpg"
+      ],
+      "assetCount": 1,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 46060,
+      "hasOrig": true,
+      "origSize": 46060,
+      "assetFilesCount": 1,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 9,
+    "folder": "09-users-access-control",
+    "name": "Avencis WFM — Users & Access Control Dashboard",
+    "id": "4dcc6203c6754e36ab749fd86d2a07df",
+    "status": "SUCCESS",
+    "assetCount": 2,
+    "device": "DESKTOP",
+    "dimensions": "2560x5884",
+    "manifestEntry": {
+      "screenNumber": "09",
+      "screenFolder": "09-users-access-control",
+      "screenName": "Avencis WFM — Users & Access Control Dashboard",
+      "originalStitchScreenId": "4dcc6203c6754e36ab749fd86d2a07df",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x5884",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/09-users-access-control/screen-code.original.html",
+        "screens/09-users-access-control/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/09-users-access-control/assets/screen-preview.png",
+        "screens/09-users-access-control/assets/asset-01.png"
+      ],
+      "assetCount": 2,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 65852,
+      "hasOrig": true,
+      "origSize": 66144,
+      "assetFilesCount": 2,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 10,
+    "folder": "10-reports-analytics",
+    "name": "Avencis WFM — Reports & Analytics Dashboard",
+    "id": "6e882b45a0684513869d482ced55729a",
+    "status": "SUCCESS",
+    "assetCount": 2,
+    "device": "DESKTOP",
+    "dimensions": "2560x6620",
+    "manifestEntry": {
+      "screenNumber": "10",
+      "screenFolder": "10-reports-analytics",
+      "screenName": "Avencis WFM — Reports & Analytics Dashboard",
+      "originalStitchScreenId": "6e882b45a0684513869d482ced55729a",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x6620",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/10-reports-analytics/screen-code.original.html",
+        "screens/10-reports-analytics/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/10-reports-analytics/assets/screen-preview.jpg",
+        "screens/10-reports-analytics/assets/asset-01.png"
+      ],
+      "assetCount": 2,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 53911,
+      "hasOrig": true,
+      "origSize": 54203,
+      "assetFilesCount": 2,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 11,
+    "folder": "11-permission-matrix",
+    "name": "Avencis WFM — Enterprise Permission Matrix",
+    "id": "e0e4d86fb6014df3ab7ebc85e99dd416",
+    "status": "SUCCESS",
+    "assetCount": 2,
+    "device": "DESKTOP",
+    "dimensions": "2560x5842",
+    "manifestEntry": {
+      "screenNumber": "11",
+      "screenFolder": "11-permission-matrix",
+      "screenName": "Avencis WFM — Enterprise Permission Matrix",
+      "originalStitchScreenId": "e0e4d86fb6014df3ab7ebc85e99dd416",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x5842",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/11-permission-matrix/screen-code.original.html",
+        "screens/11-permission-matrix/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/11-permission-matrix/assets/screen-preview.png",
+        "screens/11-permission-matrix/assets/asset-01.png"
+      ],
+      "assetCount": 2,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 63914,
+      "hasOrig": true,
+      "origSize": 64206,
+      "assetFilesCount": 2,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 12,
+    "folder": "12-attendance-leave-reports",
+    "name": "Avencis WFM — Attendance & Leave Reports Ledger",
+    "id": "5fccb2c4d9744010b8e66a891cdcf9f4",
+    "status": "SUCCESS",
+    "assetCount": 2,
+    "device": "DESKTOP",
+    "dimensions": "2560x5136",
+    "manifestEntry": {
+      "screenNumber": "12",
+      "screenFolder": "12-attendance-leave-reports",
+      "screenName": "Avencis WFM — Attendance & Leave Reports Ledger",
+      "originalStitchScreenId": "5fccb2c4d9744010b8e66a891cdcf9f4",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x5136",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/12-attendance-leave-reports/screen-code.original.html",
+        "screens/12-attendance-leave-reports/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/12-attendance-leave-reports/assets/screen-preview.png",
+        "screens/12-attendance-leave-reports/assets/asset-01.png"
+      ],
+      "assetCount": 2,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 50279,
+      "hasOrig": true,
+      "origSize": 50571,
+      "assetFilesCount": 2,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 13,
+    "folder": "13-security-audit-logs",
+    "name": "Avencis WFM — Security Audit Logs & Governance Ledger",
+    "id": "7a96a9f854444039b29f6e45b401b562",
+    "status": "SUCCESS",
+    "assetCount": 3,
+    "device": "DESKTOP",
+    "dimensions": "2560x4978",
+    "manifestEntry": {
+      "screenNumber": "13",
+      "screenFolder": "13-security-audit-logs",
+      "screenName": "Avencis WFM — Security Audit Logs & Governance Ledger",
+      "originalStitchScreenId": "7a96a9f854444039b29f6e45b401b562",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x4978",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/13-security-audit-logs/screen-code.original.html",
+        "screens/13-security-audit-logs/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/13-security-audit-logs/assets/screen-preview.jpg",
+        "screens/13-security-audit-logs/assets/asset-01.png",
+        "screens/13-security-audit-logs/assets/asset-02.png"
+      ],
+      "assetCount": 3,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 50297,
+      "hasOrig": true,
+      "origSize": 50868,
+      "assetFilesCount": 3,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  },
+  {
+    "batch": "batch-02",
+    "batchIndex": 14,
+    "folder": "14-organisation-settings",
+    "name": "Avencis WFM — Organisation Settings & Profile",
+    "id": "570ed7d798de485686a608552e94c93a",
+    "status": "SUCCESS",
+    "assetCount": 2,
+    "device": "DESKTOP",
+    "dimensions": "2560x4224",
+    "manifestEntry": {
+      "screenNumber": "14",
+      "screenFolder": "14-organisation-settings",
+      "screenName": "Avencis WFM — Organisation Settings & Profile",
+      "originalStitchScreenId": "570ed7d798de485686a608552e94c93a",
+      "deviceType": "DESKTOP",
+      "dimensions": "2560x4224",
+      "retrievalStatus": "SUCCESS",
+      "verificationStatus": "VERIFIED_COMPLETE",
+      "codeFilePaths": [
+        "screens/14-organisation-settings/screen-code.original.html",
+        "screens/14-organisation-settings/screen-code.html"
+      ],
+      "assetFilePaths": [
+        "screens/14-organisation-settings/assets/screen-preview.jpg",
+        "screens/14-organisation-settings/assets/asset-01.png"
+      ],
+      "assetCount": 2,
+      "failedDownloads": [],
+      "missingResources": []
+    },
+    "audit": {
+      "hasCode": true,
+      "codeSize": 35272,
+      "hasOrig": true,
+      "origSize": 35856,
+      "assetFilesCount": 2,
+      "isCompleteHtml": true,
+      "hasTailwind": true,
+      "hasFonts": true,
+      "hasSidebar": true,
+      "hasHeader": true,
+      "hasTable": true,
+      "hasForm": true,
+      "hasModal": false
+    }
+  }
+]
