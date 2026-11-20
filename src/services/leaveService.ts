@@ -54,7 +54,7 @@ export const leaveService = {
       const balances = store.getLeaveBalances(employeeId);
       const mockRows: LeaveBalanceRow[] = balances.map(b => ({
         id: b.id,
-        client_id: (b as any).clientId || callerScope?.clientId || '10000000-0000-0000-0000-000000000001',
+        client_id: (b as any).clientId || callerScope?.clientId || '',
         employee_id: b.employeeId,
         leave_type: b.leaveType as LeaveBalanceRow['leave_type'],
         year: (b as any).year || currentYear,

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useWorkspace } from '../../context/WorkspaceContext';
-import { store } from '../../data/store';
+import { employeeService } from '../../services/employeeService';
 import { 
   FileSpreadsheet, 
   Download, 
@@ -13,6 +13,21 @@ import {
   Printer
 } from 'lucide-react';
 
+interface DisplayEmployee {
+  id: string;
+  firstName: string;
+  lastName: string;
+  employeeCode: string;
+  designation: string;
+  bankName: string;
+  accountNumber: string;
+  ifscCode: string;
+  fixedMonthlySalary: number;
+  variableIncentive: number;
+  uanNumber: string;
+  esicNumber: string;
+}
+
 export const ReportsAnalyticsView: React.FC = () => {
   const { clients, currentClient } = useWorkspace();
 
@@ -21,6 +36,8 @@ export const ReportsAnalyticsView: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState<number>(10);
   const [selectedYear, setSelectedYear] = useState<number>(2026);
   const [isGenerated, setIsGenerated] = useState<boolean>(true);
+  const [employees, setEmployees] = useState<DisplayEmployee[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const reportTypes = [
     { id: 'muster', name: 'Monthly Attendance Muster (Form II)', desc: 'Daily punch status, paid days, loss of pay for compliance' },
@@ -31,8 +48,44 @@ export const ReportsAnalyticsView: React.FC = () => {
   ];
 
   const client = clients.find(c => c.id === selectedClient) || clients[0];
-  const employees = client ? store.getEmployees(client.id) : [];
-  const policy = client ? store.getClientPolicy(client.id) : undefined;
+
+  const fetchEmployees = useCallback(async () => {
+    if (!client?.id) {
+      setEmployees([]);
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const res = await employeeService.getEmployees({ clientId: client.id });
+      if (res.data) {
+        const mapped: DisplayEmployee[] = res.data.map(e => ({
+          id: e.id,
+          firstName: e.first_name,
+          lastName: e.last_name,
+          employeeCode: e.employee_code,
+          designation: e.designation || 'Staff',
+          bankName: (e as any).bank_name || 'HDFC Bank',
+          accountNumber: (e as any).account_number || '000000000000',
+          ifscCode: (e as any).ifsc_code || 'HDFC0000001',
+          fixedMonthlySalary: Number((e as any).fixed_monthly_salary || 25000),
+          variableIncentive: Number((e as any).variable_incentive || 0),
+          uanNumber: (e as any).uan_number || '',
+          esicNumber: (e as any).esic_number || '',
+        }));
+        setEmployees(mapped);
+      } else {
+        setEmployees([]);
+      }
+    } catch (err) {
+      console.error('Failed to load employees for report:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [client?.id]);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   const handleDownload = () => {
     let headers: string[] = [];
@@ -181,22 +234,30 @@ export const ReportsAnalyticsView: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/20">
-                {employees.map((emp) => {
-                  const unpaid = emp.id.endsWith('05') ? 1 : 0;
-                  const paid = 30 - unpaid;
-                  return (
-                    <tr key={emp.id} className="hover:bg-surface-container-low/40">
-                      <td className="p-3 font-semibold text-on-surface">{emp.firstName} {emp.lastName}</td>
-                      <td className="p-3 font-mono text-on-surface-variant">{emp.employeeCode}</td>
-                      <td className="p-3 text-on-surface-variant">{emp.designation}</td>
-                      <td className="p-3 text-center">30</td>
-                      <td className="p-3 text-center font-medium">25</td>
-                      <td className="p-3 text-center">4</td>
-                      <td className="p-3 text-center font-bold text-error">{unpaid}</td>
-                      <td className="p-3 text-right font-mono font-bold text-primary">{paid}</td>
-                    </tr>
-                  );
-                })}
+                {employees.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="p-8 text-center text-on-surface-variant">
+                      No employee records found for this organisation. Onboard employees to populate attendance muster.
+                    </td>
+                  </tr>
+                ) : (
+                  employees.map((emp) => {
+                    const unpaid = emp.id.endsWith('05') ? 1 : 0;
+                    const paid = 30 - unpaid;
+                    return (
+                      <tr key={emp.id} className="hover:bg-surface-container-low/40">
+                        <td className="p-3 font-semibold text-on-surface">{emp.firstName} {emp.lastName}</td>
+                        <td className="p-3 font-mono text-on-surface-variant">{emp.employeeCode}</td>
+                        <td className="p-3 text-on-surface-variant">{emp.designation}</td>
+                        <td className="p-3 text-center">30</td>
+                        <td className="p-3 text-center font-medium">25</td>
+                        <td className="p-3 text-center">4</td>
+                        <td className="p-3 text-center font-bold text-error">{unpaid}</td>
+                        <td className="p-3 text-right font-mono font-bold text-primary">{paid}</td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           )}
@@ -215,28 +276,36 @@ export const ReportsAnalyticsView: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/20">
-                {employees.map((emp) => {
-                  const unpaid = emp.id.endsWith('05') ? 1 : 0;
-                  const paid = 30 - unpaid;
-                  const net = Math.round((emp.fixedMonthlySalary / 30) * paid * 0.88 + emp.variableIncentive);
-                  return (
-                    <tr key={emp.id} className="hover:bg-surface-container-low/40">
-                      <td className="p-3 font-semibold text-on-surface">{emp.firstName} {emp.lastName}</td>
-                      <td className="p-3 font-mono text-on-surface-variant">{emp.employeeCode}</td>
-                      <td className="p-3">{emp.bankName}</td>
-                      <td className="p-3 font-mono">{emp.accountNumber}</td>
-                      <td className="p-3 font-mono">{emp.ifscCode}</td>
-                      <td className="p-3 text-right font-mono font-bold text-emerald-900">
-                        ₹{net.toLocaleString('en-IN')}
-                      </td>
-                      <td className="p-3 text-center">
-                        <span className="px-2 py-0.5 rounded bg-surface-container text-[10px] font-mono font-bold">
-                          NEFT
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {employees.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="p-8 text-center text-on-surface-variant">
+                      No employee banking records found for this organisation.
+                    </td>
+                  </tr>
+                ) : (
+                  employees.map((emp) => {
+                    const unpaid = emp.id.endsWith('05') ? 1 : 0;
+                    const paid = 30 - unpaid;
+                    const net = Math.round((emp.fixedMonthlySalary / 30) * paid * 0.88 + emp.variableIncentive);
+                    return (
+                      <tr key={emp.id} className="hover:bg-surface-container-low/40">
+                        <td className="p-3 font-semibold text-on-surface">{emp.firstName} {emp.lastName}</td>
+                        <td className="p-3 font-mono text-on-surface-variant">{emp.employeeCode}</td>
+                        <td className="p-3">{emp.bankName}</td>
+                        <td className="p-3 font-mono">{emp.accountNumber}</td>
+                        <td className="p-3 font-mono">{emp.ifscCode}</td>
+                        <td className="p-3 text-right font-mono font-bold text-emerald-900">
+                          ₹{net.toLocaleString('en-IN')}
+                        </td>
+                        <td className="p-3 text-center">
+                          <span className="px-2 py-0.5 rounded bg-surface-container text-[10px] font-mono font-bold">
+                            NEFT
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           )}
@@ -254,23 +323,31 @@ export const ReportsAnalyticsView: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/20">
-                {employees.map((emp) => {
-                  const wage = Math.min(emp.fixedMonthlySalary, 15000);
-                  const empShare = Math.round(wage * 0.12);
-                  const emplyrShare = Math.round(wage * 0.12);
-                  return (
-                    <tr key={emp.id} className="hover:bg-surface-container-low/40">
-                      <td className="p-3 font-semibold text-on-surface">{emp.firstName} {emp.lastName}</td>
-                      <td className="p-3 font-mono">{emp.uanNumber || emp.esicNumber || '109876543210'}</td>
-                      <td className="p-3 text-right font-mono">₹{wage.toLocaleString('en-IN')}</td>
-                      <td className="p-3 text-right font-mono text-error">₹{empShare.toLocaleString('en-IN')}</td>
-                      <td className="p-3 text-right font-mono text-primary">₹{emplyrShare.toLocaleString('en-IN')}</td>
-                      <td className="p-3 text-right font-mono font-bold text-on-surface">
-                        ₹{(empShare + emplyrShare).toLocaleString('en-IN')}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {employees.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-on-surface-variant">
+                      No employee statutory records found for this organisation.
+                    </td>
+                  </tr>
+                ) : (
+                  employees.map((emp) => {
+                    const wage = Math.min(emp.fixedMonthlySalary, 15000);
+                    const empShare = Math.round(wage * 0.12);
+                    const emplyrShare = Math.round(wage * 0.12);
+                    return (
+                      <tr key={emp.id} className="hover:bg-surface-container-low/40">
+                        <td className="p-3 font-semibold text-on-surface">{emp.firstName} {emp.lastName}</td>
+                        <td className="p-3 font-mono">{emp.uanNumber || emp.esicNumber || '109876543210'}</td>
+                        <td className="p-3 text-right font-mono">₹{wage.toLocaleString('en-IN')}</td>
+                        <td className="p-3 text-right font-mono text-error">₹{empShare.toLocaleString('en-IN')}</td>
+                        <td className="p-3 text-right font-mono text-primary">₹{emplyrShare.toLocaleString('en-IN')}</td>
+                        <td className="p-3 text-right font-mono font-bold text-on-surface">
+                          ₹{(empShare + emplyrShare).toLocaleString('en-IN')}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           )}

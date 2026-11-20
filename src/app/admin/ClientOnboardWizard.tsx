@@ -209,7 +209,7 @@ export const ClientOnboardWizard: React.FC = () => {
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                placeholder="e.g. Suman Technologies & Retail"
+                placeholder="e.g. Acme Corporation"
                 className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs"
               />
             </div>
@@ -220,7 +220,7 @@ export const ClientOnboardWizard: React.FC = () => {
                 type="text"
                 value={code}
                 onChange={e => setCode(e.target.value)}
-                placeholder="e.g. SUMAN or MAHA"
+                placeholder="e.g. ACME or CORP"
                 className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs uppercase"
               />
             </div>
@@ -328,7 +328,7 @@ export const ClientOnboardWizard: React.FC = () => {
                 type="text"
                 value={legalName}
                 onChange={e => setLegalName(e.target.value)}
-                placeholder="e.g. Suman Technologies Private Limited"
+                placeholder="e.g. Acme Enterprises Private Limited"
                 className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs"
               />
             </div>

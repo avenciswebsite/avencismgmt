@@ -760,7 +760,7 @@ export const attendanceService = {
 
       return successResponse<AttendanceCorrectionRow>({
         id: updated.id,
-        client_id: updated.clientId || 'client-suman',
+        client_id: updated.clientId || '',
         employee_id: updated.employeeId,
         date: updated.date,
         original_check_in: null,

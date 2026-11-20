@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useWorkspace } from '../../context/WorkspaceContext';
-import { store } from '../../data/store';
+import { employeeService } from '../../services/employeeService';
 import { attendanceService } from '../../services/attendanceService';
 import { leaveService } from '../../services/leaveService';
 import { payrollService } from '../../services/payrollService';
@@ -42,7 +42,7 @@ interface EmployeePortalProps {
 
 export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'punch' }) => {
   const { user } = useAuth();
-  const { currentClient, activeLocations, activeLegalEntity } = useWorkspace();
+  const { currentClient, activeLocations, activeLegalEntity, departments, clientPolicy } = useWorkspace();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -116,17 +116,82 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
   const [selectedPayslipMonth, setSelectedPayslipMonth] = useState<string | null>(null);
 
   // Data retrieval
-  const employees = currentClient ? store.getEmployees(currentClient.id) : [];
-  const currentEmp = employees.find(e => e.email.toLowerCase() === user?.email.toLowerCase()) || employees[0];
-  const departments = currentClient ? store.getDepartments(currentClient.id) : [];
+  const [employees, setEmployees] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (currentClient?.id) {
+      employeeService.getEmployees({ clientId: currentClient.id }).then(res => {
+        if (res.data) {
+          setEmployees(res.data.map(e => ({
+            id: e.id,
+            clientId: e.client_id,
+            legalEntityId: e.legal_entity_id,
+            workLocationId: e.work_location_id,
+            departmentId: (e as any).department_id || '',
+            employeeCode: e.employee_code,
+            firstName: e.first_name,
+            lastName: e.last_name,
+            email: e.email,
+            mobile: (e as any).mobile || (e as any).phone || '',
+            designation: e.designation || 'Staff',
+            joiningDate: (e as any).joining_date || (e as any).date_of_joining || new Date().toISOString().split('T')[0],
+            employmentType: 'FULL_TIME',
+            status: 'ACTIVE',
+            fixedMonthlySalary: Number((e as any).fixed_monthly_salary || 25000),
+            variableIncentive: Number((e as any).variable_incentive || 0),
+            otherAllowances: 0,
+            bankName: (e as any).bank_name || 'HDFC Bank',
+            accountNumber: (e as any).account_number || '000000000000',
+            ifscCode: (e as any).ifsc_code || 'HDFC0000001',
+            panNumber: (e as any).pan || '',
+            aadhaarNumber: (e as any).aadhaar || '',
+            uanNumber: (e as any).uan_number || '',
+            esicNumber: (e as any).esic_number || '',
+          })));
+        }
+      });
+    }
+  }, [currentClient?.id]);
+
+  const currentEmp = employees.find(e => e.email?.toLowerCase() === user?.email?.toLowerCase()) || employees[0];
   const departmentName = currentEmp ? (departments.find(d => d.id === currentEmp.departmentId)?.name || 'Operations') : 'Operations';
-  const attendanceRecords = currentClient ? store.getAttendanceRecords(currentClient.id) : [];
-  const todayAttendance = currentEmp ? attendanceRecords.find(a => a.employeeId === currentEmp.id) : undefined;
-  const leaveBalances = currentEmp ? store.getLeaveBalances(currentEmp.id) : [];
-  const employeeRequests = currentEmp ? store.getLeaveRequests(currentClient?.id).filter(r => r.employeeId === currentEmp.id) : [];
-  const employeeCorrections = currentEmp ? store.getCorrections(currentClient?.id).filter(c => c.employeeId === currentEmp.id) : [];
+  const todayAttendance = liveMuster ? {
+    checkInTime: liveMuster.check_in_time || liveMuster.checkInTime,
+    checkOutTime: liveMuster.check_out_time || liveMuster.checkOutTime,
+    totalHours: liveMuster.total_hours ?? liveMuster.totalHours,
+  } : undefined;
+  const leaveBalances = liveLeaveBalances.map(b => ({
+    id: b.id,
+    employeeId: b.employee_id,
+    leaveType: b.leave_type,
+    opening: b.opening,
+    credited: b.credited,
+    used: b.used,
+    closing: b.closing,
+  }));
+  const employeeRequests = liveLeaveRequests.map(r => ({
+    id: r.id,
+    employeeId: r.employee_id,
+    leaveType: r.leave_type,
+    startDate: r.start_date,
+    endDate: r.end_date,
+    totalDays: r.total_days,
+    reason: r.reason,
+    status: r.status.toUpperCase(),
+    appliedAt: (r as any).created_at || (r as any).applied_at || new Date().toISOString(),
+  }));
+  const employeeCorrections = liveCorrections.map(c => ({
+    id: c.id,
+    employeeId: c.employee_id,
+    date: c.date,
+    requestedCheckIn: c.requested_check_in,
+    requestedCheckOut: c.requested_check_out,
+    reason: c.reason,
+    status: c.status.toUpperCase(),
+    managerRemarks: c.manager_remarks,
+  }));
   const assignedLocation = currentEmp ? (activeLocations.find(l => l.id === currentEmp.workLocationId) || activeLocations[0]) : undefined;
-  const policy = currentClient ? store.getClientPolicy(currentClient.id) : undefined;
+  const policy = clientPolicy;
 
   const currentClientId = currentClient?.id;
   const currentEmpId = currentEmp?.id;
@@ -277,7 +342,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
       return;
     }
 
-    const policy = currentClient ? store.getClientPolicy(currentClient.id) : null;
+    const policy = clientPolicy;
     const calc = calculateEffectiveLeaveDays({
       startDate,
       endDate,
@@ -429,7 +494,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
     netPay = portalPayrollItem.netSalary;
   } else {
     calendarDays = getDaysInMonth(10, 2026);
-    const empAtt = store.getAttendanceRecords(currentClient.id).filter(r => r.employeeId === currentEmp.id);
+    const empAtt: any[] = [];
     const attSummary = aggregateMonthlyAttendance(empAtt, 10, 2026, currentEmp.joiningDate);
     paidDays = attSummary.paidDays;
     unpaidDays = attSummary.unpaidDays;

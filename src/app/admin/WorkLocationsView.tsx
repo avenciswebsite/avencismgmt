@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { useAuth } from '../../context/AuthContext';
 import { policyService } from '../../services/policyService';
-import { store } from '../../data/store';
 import { WorkLocation } from '../../types';
 import { 
   MapPin, 
@@ -37,6 +36,8 @@ export const WorkLocationsView: React.FC = () => {
   // Modals
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [editingLocation, setEditingLocation] = useState<WorkLocation | null>(null);
+  const [locations, setLocations] = useState<WorkLocation[]>([]);
+  const [isLoadingLocations, setIsLoadingLocations] = useState<boolean>(false);
 
   // Form states
   const [formClientId, setFormClientId] = useState<string>(
@@ -61,17 +62,46 @@ export const WorkLocationsView: React.FC = () => {
     }
   }, [isSuperAdmin, activeClient]);
 
-  // Aggregate locations
-  let allLocations: WorkLocation[] = [];
-  if (selectedClientId === 'ALL') {
-    clients.forEach(c => {
-      allLocations = allLocations.concat(store.getLocations(c.id));
-    });
-  } else {
-    allLocations = store.getLocations(selectedClientId);
-  }
+  const loadLocations = useCallback(async () => {
+    if (!clients.length) {
+      setLocations([]);
+      return;
+    }
+    setIsLoadingLocations(true);
+    try {
+      const all: WorkLocation[] = [];
+      const targetClients = selectedClientId === 'ALL' ? clients : clients.filter(c => c.id === selectedClientId);
+      for (const c of targetClients) {
+        const res = await policyService.getWorkLocations(c.id);
+        if (res.data) {
+          for (const row of res.data) {
+            all.push({
+              id: row.id,
+              clientId: row.client_id,
+              name: row.name,
+              address: row.address,
+              state: row.state,
+              latitude: Number(row.latitude),
+              longitude: Number(row.longitude),
+              radiusMeters: row.radius_meters,
+              activeHeadcount: row.active_headcount || 0,
+            });
+          }
+        }
+      }
+      setLocations(all);
+    } catch (err) {
+      console.error('Failed to load work locations:', err);
+    } finally {
+      setIsLoadingLocations(false);
+    }
+  }, [clients, selectedClientId]);
 
-  const filteredLocations = allLocations.filter(loc => {
+  useEffect(() => {
+    loadLocations();
+  }, [loadLocations]);
+
+  const filteredLocations = locations.filter(loc => {
     const matchesSearch = loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           loc.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           ((loc.state || '').toLowerCase().includes(searchQuery.toLowerCase()));
@@ -191,6 +221,7 @@ export const WorkLocationsView: React.FC = () => {
         setFeedback({ type: 'success', message: `Registered new work site "${formName}" with ${radius}m geofence radius.` });
       }
 
+      await loadLocations();
       refreshWorkspace();
       setShowAddModal(false);
       setTimeout(() => setFeedback(null), 4000);
@@ -212,6 +243,7 @@ export const WorkLocationsView: React.FC = () => {
         throw new Error(res.error?.message || 'Failed to delete work location.');
       }
       setFeedback({ type: 'success', message: `Work location "${loc.name}" was successfully removed.` });
+      await loadLocations();
       refreshWorkspace();
       setTimeout(() => setFeedback(null), 4000);
     } catch (err: any) {
@@ -296,8 +328,29 @@ export const WorkLocationsView: React.FC = () => {
       </div>
 
       {/* Locations Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredLocations.map((loc) => {
+      {filteredLocations.length === 0 ? (
+        <div className="bg-surface-container-lowest p-12 rounded-xl border border-outline-variant/30 text-center max-w-lg mx-auto">
+          <MapPin className="w-12 h-12 text-outline mx-auto mb-3" />
+          <h3 className="text-base font-bold text-on-surface">No Work Locations Configured</h3>
+          <p className="text-xs text-on-surface-variant mt-1">
+            {clients.length === 0 
+              ? "Onboard your first client organisation from the dashboard to begin establishing worksites and geofencing boundaries." 
+              : "No physical work locations match the selected client filter."}
+          </p>
+          {clients.length > 0 && (
+            <button
+              type="button"
+              onClick={handleOpenAdd}
+              className="mt-4 inline-flex items-center space-x-1.5 px-4 py-2 bg-primary text-white text-xs font-bold rounded-lg shadow hover:bg-primary-hover"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Work Site</span>
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredLocations.map((loc) => {
           const client = clients.find(c => c.id === loc.clientId);
           const mapsUrl = `https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`;
 
@@ -392,22 +445,6 @@ export const WorkLocationsView: React.FC = () => {
           );
         })}
       </div>
-
-      {filteredLocations.length === 0 && (
-        <div className="p-12 text-center bg-surface-container-lowest rounded-xl border border-outline-variant/30 space-y-3">
-          <MapPin className="w-8 h-8 text-outline mx-auto" />
-          <h3 className="font-serif text-lg text-primary">No Work Locations Found</h3>
-          <p className="text-xs text-on-surface-variant max-w-md mx-auto">
-            No physical sites match your search filter. Register your organization's physical operating locations to enable mobile GPS check-in.
-          </p>
-          <button
-            onClick={handleOpenAdd}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded font-medium text-xs hover:bg-primary/90 transition-colors shadow-sm"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Add Work Site Now</span>
-          </button>
-        </div>
       )}
 
       {/* Add / Edit Working Site Modal */}

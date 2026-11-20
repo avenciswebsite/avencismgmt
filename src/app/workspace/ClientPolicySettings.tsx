@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { store } from '../../data/store';
+import { policyService } from '../../services/policyService';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { 
   Sliders, 
@@ -19,10 +19,10 @@ import {
 
 export const ClientPolicySettings: React.FC = () => {
   const { clientId } = useParams<{ clientId: string }>();
-  const { activeClient, refreshWorkspace } = useWorkspace();
+  const { activeClient, clientPolicy, refreshWorkspace } = useWorkspace();
 
   const client = activeClient;
-  const currentPolicy = store.getClientPolicy(client.id);
+  const currentPolicy = clientPolicy;
 
   // Form State for the 20 Policy Domains
   const [salaryDivisor, setSalaryDivisor] = useState(currentPolicy.salaryDivisor);
@@ -35,7 +35,7 @@ export const ClientPolicySettings: React.FC = () => {
   const [halfDayHours, setHalfDayHours] = useState(currentPolicy.halfDayHours.toString());
   
   // Weekly Offs
-  const [weeklyOffs, setWeeklyOffs] = useState<string[]>(currentPolicy.weeklyOffDays);
+  const [weeklyOffs, setWeeklyOffs] = useState<string[]>(currentPolicy.weeklyOffDays || []);
 
   // Telemetry
   const [trackingMode, setTrackingMode] = useState(currentPolicy.attendanceTrackingMode);
@@ -57,38 +57,84 @@ export const ClientPolicySettings: React.FC = () => {
   const [tdsEnabled, setTdsEnabled] = useState(currentPolicy.tdsEnabled);
 
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (clientPolicy) {
+      setSalaryDivisor(clientPolicy.salaryDivisor);
+      setOvertimeMethod(clientPolicy.overtimeMethod);
+      setOvertimeRate(clientPolicy.overtimeRate.toString());
+      setLateGraceMinutes(clientPolicy.lateGraceMinutes.toString());
+      setLatePenaltyRule(clientPolicy.latePenaltyRule);
+      setOvernightShiftAttribution(clientPolicy.overnightShiftAttribution);
+      setStandardWorkingHours(clientPolicy.standardWorkingHours.toString());
+      setHalfDayHours(clientPolicy.halfDayHours.toString());
+      setWeeklyOffs(clientPolicy.weeklyOffDays || []);
+      setTrackingMode(clientPolicy.attendanceTrackingMode);
+      setRequireGps(clientPolicy.requireGps);
+      setRequireSelfie(clientPolicy.requireSelfie);
+      setEnforceStrictGeofence(clientPolicy.enforceStrictGeofence);
+      setMonthlyLeave(clientPolicy.monthlyPaidLeaveAccrual.toString());
+      setMaxCarryForward(clientPolicy.maxCarryForward.toString());
+      setAllowEncashment(clientPolicy.allowLeaveEncashment);
+      setPfEnabled(clientPolicy.pfEnabled);
+      setPfEmpRate(clientPolicy.pfEmployeePercent.toString());
+      setEsicEnabled(clientPolicy.esicEnabled);
+      setEsicEmpRate(clientPolicy.esicEmployeePercent.toString());
+      setPtEnabled(clientPolicy.ptEnabled);
+      setTdsEnabled(clientPolicy.tdsEnabled);
+    }
+  }, [clientPolicy]);
+
+  if (!client || !client.id) {
+    return (
+      <div className="p-8 text-center bg-surface-container rounded-xl border border-outline-variant/30 max-w-2xl mx-auto my-12">
+        <AlertCircle className="w-12 h-12 text-primary mx-auto mb-3" />
+        <h2 className="text-lg font-bold text-on-surface">No Workspace Selected</h2>
+        <p className="text-sm text-on-surface-variant mt-1">Please select an onboarded client organisation from the Master Administration dashboard to view or configure its policies.</p>
+      </div>
+    );
+  }
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    store.updateClientPolicy(client.id, {
-      isConfigured: true,
-      salaryDivisor,
-      overtimeMethod,
-      overtimeRate: parseFloat(overtimeRate) || 1.0,
-      lateGraceMinutes: parseInt(lateGraceMinutes) || 0,
-      latePenaltyRule,
-      overnightShiftAttribution,
-      standardWorkingHours: parseFloat(standardWorkingHours) || 9.0,
-      halfDayHours: parseFloat(halfDayHours) || 4.5,
-      weeklyOffDays: weeklyOffs as any,
-      attendanceTrackingMode: trackingMode,
-      requireGps,
-      requireSelfie,
-      enforceStrictGeofence,
-      monthlyPaidLeaveAccrual: parseFloat(monthlyLeave) || 2.0,
-      maxCarryForward: parseInt(maxCarryForward) || 30,
-      allowLeaveEncashment: allowEncashment,
-      pfEnabled,
-      pfEmployeePercent: parseFloat(pfEmpRate) || 12.0,
-      esicEnabled,
-      esicEmployeePercent: parseFloat(esicEmpRate) || 0.75,
-      ptEnabled,
-      tdsEnabled,
-    });
+    if (!client.id) return;
+    setIsSaving(true);
+    try {
+      await policyService.updateClientPolicy(client.id, {
+        is_configured: true,
+        salary_divisor: salaryDivisor,
+        overtime_method: overtimeMethod,
+        overtime_rate: parseFloat(overtimeRate) || 1.0,
+        late_grace_minutes: parseInt(lateGraceMinutes) || 0,
+        late_penalty_rule: latePenaltyRule,
+        overnight_shift_attribution: overnightShiftAttribution,
+        standard_working_hours: parseFloat(standardWorkingHours) || 9.0,
+        half_day_hours: parseFloat(halfDayHours) || 4.5,
+        weekly_off_days: weeklyOffs,
+        attendance_tracking_mode: trackingMode,
+        require_gps: requireGps,
+        require_selfie: requireSelfie,
+        enforce_strict_geofence: enforceStrictGeofence,
+        monthly_paid_leave_accrual: parseFloat(monthlyLeave) || 2.0,
+        max_carry_forward: parseInt(maxCarryForward) || 30,
+        allow_leave_encashment: allowEncashment,
+        pf_enabled: pfEnabled,
+        pf_employee_percent: parseFloat(pfEmpRate) || 12.0,
+        esic_enabled: esicEnabled,
+        esic_employee_percent: parseFloat(esicEmpRate) || 0.75,
+        pt_enabled: ptEnabled,
+        tds_enabled: tdsEnabled,
+      } as any);
 
-    refreshWorkspace();
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 3000);
+      refreshWorkspace();
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3000);
+    } catch (err) {
+      console.error('Failed to update client policy:', err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (

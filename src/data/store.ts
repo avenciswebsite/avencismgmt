@@ -79,6 +79,24 @@ class AppStore {
 
   private loadFromStorage() {
     try {
+      // Clean legacy mock storage from earlier dev previews
+      const legacyKeys = [
+        'avencis_wfm_clients',
+        'avencis_wfm_employees',
+        'avencis_wfm_policies',
+        'avencis_wfm_attendance',
+        'avencis_wfm_leave_requests',
+        'avencis_wfm_payroll_runs',
+        'avencis_wfm_payslips',
+        'avencis_wfm_audit_logs',
+      ];
+      
+      const rawClients = localStorage.getItem('avencis_wfm_clients');
+      if (rawClients && (rawClients.includes('client-suman') || rawClients.includes('Suman Technologies'))) {
+        legacyKeys.forEach(k => localStorage.removeItem(k));
+        return;
+      }
+
       const c = localStorage.getItem('avencis_wfm_clients');
       if (c) this.clients = JSON.parse(c);
       const e = localStorage.getItem('avencis_wfm_employees');

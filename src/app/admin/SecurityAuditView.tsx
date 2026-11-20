@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useWorkspace } from '../../context/WorkspaceContext';
-import { store } from '../../data/store';
+import { reportingService } from '../../services/reportingService';
+import { AuditLogRow } from '../../services/serviceTypes';
 import { 
   ShieldAlert, 
   Search, 
@@ -20,17 +21,35 @@ export const SecurityAuditView: React.FC = () => {
   const [selectedClient, setSelectedClient] = useState<string>('ALL');
   const [selectedSeverity, setSelectedSeverity] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [logs, setLogs] = useState<AuditLogRow[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const logs = selectedClient === 'ALL' 
-    ? store.getAuditLogs() 
-    : store.getAuditLogs(selectedClient);
+  const fetchLogs = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await reportingService.getAuditLogs(
+        selectedClient !== 'ALL' ? { clientId: selectedClient, limit: 100 } : { limit: 100 }
+      );
+      if (res.data) {
+        setLogs(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load audit logs:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedClient]);
+
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
 
   const filteredLogs = logs.filter(l => {
     const matchesSeverity = selectedSeverity === 'ALL' || l.severity === selectedSeverity;
     const matchesSearch = l.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          l.details.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          l.actorName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          l.targetEntity.toLowerCase().includes(searchQuery.toLowerCase());
+                          (l.details || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          (l.actor_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          l.target_entity.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSeverity && matchesSearch;
   });
 
@@ -39,10 +58,10 @@ export const SecurityAuditView: React.FC = () => {
     const rows = filteredLogs.map(l => [
       `"${new Date(l.timestamp).toISOString()}"`,
       `"${l.action.replace(/"/g, '""')}"`,
-      `"${l.targetEntity.replace(/"/g, '""')}"`,
-      `"${l.actorName.replace(/"/g, '""')}"`,
+      `"${l.target_entity.replace(/"/g, '""')}"`,
+      `"${(l.actor_name || 'System').replace(/"/g, '""')}"`,
       `"${l.severity}"`,
-      `"${l.details.replace(/"/g, '""')}"`
+      `"${(l.details || '').replace(/"/g, '""')}"`
     ]);
     const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
     const encodedUri = encodeURI(csvContent);
@@ -138,57 +157,65 @@ export const SecurityAuditView: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/20">
-              {filteredLogs.map((log) => {
-                const dateStr = new Date(log.timestamp).toLocaleString('en-IN', {
-                  day: '2-digit',
-                  month: 'short',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                });
+              {filteredLogs.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="p-8 text-center text-on-surface-variant">
+                    No security audit logs recorded yet. All administrative actions and policy changes will be automatically logged here.
+                  </td>
+                </tr>
+              ) : (
+                filteredLogs.map((log) => {
+                  const dateStr = new Date(log.timestamp).toLocaleString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                  });
 
-                return (
-                  <tr key={log.id} className="hover:bg-surface-container-low/40">
-                    <td className="p-3">
-                      <span className="font-mono text-on-surface block font-medium">{dateStr}</span>
-                      <span className="font-mono text-[10px] text-on-surface-variant">IP: {log.ipAddress}</span>
-                    </td>
-                    <td className="p-3">
-                      <span className="font-mono font-bold text-primary block">{log.action}</span>
-                      <span className="text-[10px] text-on-surface-variant font-mono">{log.id}</span>
-                    </td>
-                    <td className="p-3">
-                      <span className="font-semibold text-on-surface block">{log.targetEntity}</span>
-                      <span className="font-mono text-[10px] text-on-surface-variant truncate max-w-[120px] block">
-                        {log.targetId}
-                      </span>
-                    </td>
-                    <td className="p-3">
-                      <span className="font-semibold text-on-surface block">{log.actorName}</span>
-                      <span className="text-[10px] text-on-surface-variant capitalize">
-                        {log.actorRole.replace('_', ' ')}
-                      </span>
-                    </td>
-                    <td className="p-3 max-w-xs text-on-surface leading-relaxed">
-                      {log.details}
-                    </td>
-                    <td className="p-3 text-center">
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                          log.severity === 'critical'
-                            ? 'bg-red-100 text-red-800'
-                            : log.severity === 'warning'
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-emerald-100 text-emerald-800'
-                        }`}
-                      >
-                        {log.severity}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
+                  return (
+                    <tr key={log.id} className="hover:bg-surface-container-low/40">
+                      <td className="p-3">
+                        <span className="font-mono text-on-surface block font-medium">{dateStr}</span>
+                        <span className="font-mono text-[10px] text-on-surface-variant">IP: {log.ip_address || '127.0.0.1'}</span>
+                      </td>
+                      <td className="p-3">
+                        <span className="font-mono font-bold text-primary block">{log.action}</span>
+                        <span className="text-[10px] text-on-surface-variant font-mono">{log.id}</span>
+                      </td>
+                      <td className="p-3">
+                        <span className="font-semibold text-on-surface block">{log.target_entity}</span>
+                        <span className="font-mono text-[10px] text-on-surface-variant truncate max-w-[120px] block">
+                          {log.target_id || '-'}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <span className="font-semibold text-on-surface block">{log.actor_name || 'System'}</span>
+                        <span className="text-[10px] text-on-surface-variant capitalize">
+                          Super Admin
+                        </span>
+                      </td>
+                      <td className="p-3 max-w-xs text-on-surface leading-relaxed">
+                        {log.details || '-'}
+                      </td>
+                      <td className="p-3 text-center">
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                            log.severity === 'critical'
+                              ? 'bg-red-100 text-red-800'
+                              : log.severity === 'warning'
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-emerald-100 text-emerald-800'
+                          }`}
+                        >
+                          {log.severity}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

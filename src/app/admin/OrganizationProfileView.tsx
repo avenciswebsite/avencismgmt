@@ -201,7 +201,7 @@ export const OrganizationProfileView: React.FC = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  placeholder="e.g. Suman Manufacturing Ltd"
+                  placeholder="e.g. Acme Corporation"
                   className="w-full px-3.5 py-2.5 rounded-lg bg-surface border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
@@ -217,7 +217,7 @@ export const OrganizationProfileView: React.FC = () => {
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     required
                     maxLength={20}
-                    placeholder="DEMO-SUMAN"
+                    placeholder="e.g. ACME"
                     className="w-full px-3.5 py-2.5 rounded-lg bg-surface border border-outline-variant text-on-surface text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary uppercase"
                   />
                 </div>
@@ -300,7 +300,7 @@ export const OrganizationProfileView: React.FC = () => {
                   type="email"
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
-                  placeholder="admin@sumanmfg.com"
+                  placeholder="admin@example.com"
                   className="w-full px-3.5 py-2.5 rounded-lg bg-surface border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>

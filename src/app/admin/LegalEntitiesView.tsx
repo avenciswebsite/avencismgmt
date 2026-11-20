@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useWorkspace } from '../../context/WorkspaceContext';
-import { store } from '../../data/store';
+import { policyService } from '../../services/policyService';
 import { ClientLegalEntity } from '../../types';
 import { 
   Building2, 
@@ -19,6 +19,8 @@ export const LegalEntitiesView: React.FC = () => {
   const [selectedClientId, setSelectedClientId] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [entities, setEntities] = useState<ClientLegalEntity[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Form state
   const [formClientId, setFormClientId] = useState<string>(clients[0]?.id || '');
@@ -31,13 +33,55 @@ export const LegalEntitiesView: React.FC = () => {
   const [esicCode, setEsicCode] = useState<string>('');
   const [registeredAddress, setRegisteredAddress] = useState<string>('');
 
-  // Collect all legal entities across clients
-  let allEntities: ClientLegalEntity[] = [];
-  clients.forEach(c => {
-    allEntities = allEntities.concat(store.getLegalEntities(c.id));
-  });
+  const loadEntities = useCallback(async () => {
+    if (!clients.length) {
+      setEntities([]);
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const all: ClientLegalEntity[] = [];
+      for (const c of clients) {
+        const res = await policyService.getLegalEntities(c.id);
+        if (res.data) {
+          for (const row of res.data) {
+            all.push({
+              id: row.id,
+              clientId: row.client_id,
+              legalName: row.legal_name,
+              tradeName: row.trade_name || row.legal_name,
+              registrationType: 'PRIVATE_LIMITED',
+              registrationNumber: row.registration_number || '',
+              pan: row.pan,
+              panNumber: row.pan,
+              gstin: row.gstin || '',
+              pfEstablishmentCode: row.pf_establishment_code || '',
+              esicRegistrationCode: row.esic_registration_code || '',
+              registeredAddress: row.registered_address || '',
+              isPrimary: row.is_primary,
+            });
+          }
+        }
+      }
+      setEntities(all);
+    } catch (err) {
+      console.error('Failed to load legal entities:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [clients]);
 
-  const filteredEntities = allEntities.filter(le => {
+  useEffect(() => {
+    loadEntities();
+  }, [loadEntities]);
+
+  useEffect(() => {
+    if (clients.length && !formClientId) {
+      setFormClientId(clients[0].id);
+    }
+  }, [clients, formClientId]);
+
+  const filteredEntities = entities.filter(le => {
     const matchesClient = selectedClientId === 'ALL' || le.clientId === selectedClientId;
     const matchesSearch = le.legalName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           ((le.panNumber || le.pan || '').toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -45,25 +89,25 @@ export const LegalEntitiesView: React.FC = () => {
     return matchesClient && matchesSearch;
   });
 
-  const handleCreateEntity = (e: React.FormEvent) => {
+  const handleCreateEntity = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!legalName.trim() || !panNumber.trim()) return;
+    if (!legalName.trim() || !panNumber.trim() || !formClientId) return;
 
-    store.addLegalEntity({
-      clientId: formClientId,
-      legalName,
-      tradeName: tradeName || legalName,
-      registrationType,
-      registrationNumber: `REG-${Date.now().toString(36).toUpperCase()}`,
+    await policyService.createLegalEntity({
+      client_id: formClientId,
+      legal_name: legalName,
+      trade_name: tradeName || legalName,
+      registration_type: registrationType,
+      registration_number: `REG-${Date.now().toString(36).toUpperCase()}`,
       pan: panNumber.toUpperCase(),
-      panNumber: panNumber.toUpperCase(),
       gstin: gstin.toUpperCase(),
-      pfEstablishmentCode: pfCode || '',
-      esicRegistrationCode: esicCode || '',
-      registeredAddress,
-      isPrimary: false,
+      pf_establishment_code: pfCode || null,
+      esic_registration_code: esicCode || null,
+      registered_address: registeredAddress || '',
+      is_primary: false,
     });
 
+    await loadEntities();
     setShowAddModal(false);
     // Reset form
     setLegalName('');
@@ -142,60 +186,82 @@ export const LegalEntitiesView: React.FC = () => {
       </div>
 
       {/* Legal Entities Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filteredEntities.map((entity) => {
-          const client = clients.find(c => c.id === entity.clientId);
-
-          return (
-            <div
-              key={entity.id}
-              className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm space-y-4"
+      {filteredEntities.length === 0 ? (
+        <div className="bg-surface-container-lowest p-12 rounded-xl border border-outline-variant/30 text-center max-w-lg mx-auto">
+          <Building2 className="w-12 h-12 text-outline mx-auto mb-3" />
+          <h3 className="text-base font-bold text-on-surface">No Legal Entities Found</h3>
+          <p className="text-xs text-on-surface-variant mt-1">
+            {clients.length === 0 
+              ? "Onboard your first client organisation from the dashboard to begin establishing legal employer entities." 
+              : "No legal entities have been registered yet for the selected filter."}
+          </p>
+          {clients.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowAddModal(true)}
+              className="mt-4 inline-flex items-center space-x-1.5 px-4 py-2 bg-primary text-white text-xs font-bold rounded-lg shadow hover:bg-primary-hover"
             >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-primary-container text-primary font-bold">
-                    {(entity.registrationType || 'PRIVATE_LIMITED').replace('_', ' ')}
-                  </span>
-                  <h3 className="font-serif text-xl text-primary font-normal mt-2">
-                    {entity.legalName}
-                  </h3>
-                  <p className="text-xs text-on-surface-variant font-medium">
-                    Trading as: <strong>{entity.tradeName || entity.legalName}</strong>
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="text-[10px] uppercase text-on-surface-variant block font-medium">Parent Client</span>
-                  <span className="text-xs font-bold text-primary">{client?.name || 'Assigned Client'}</span>
-                </div>
-              </div>
+              <Plus className="w-4 h-4" />
+              <span>Register Entity</span>
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {filteredEntities.map((entity) => {
+            const client = clients.find(c => c.id === entity.clientId);
 
-              <div className="grid grid-cols-2 gap-3 p-4 bg-surface-container-low rounded-lg text-xs">
-                <div>
-                  <span className="text-[10px] uppercase text-on-surface-variant block font-medium">Corporate PAN</span>
-                  <span className="font-mono font-bold text-on-surface">{entity.panNumber || entity.pan || 'N/A'}</span>
+            return (
+              <div
+                key={entity.id}
+                className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm space-y-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-primary-container text-primary font-bold">
+                      {(entity.registrationType || 'PRIVATE_LIMITED').replace('_', ' ')}
+                    </span>
+                    <h3 className="font-serif text-xl text-primary font-normal mt-2">
+                      {entity.legalName}
+                    </h3>
+                    <p className="text-xs text-on-surface-variant font-medium">
+                      Trading as: <strong>{entity.tradeName || entity.legalName}</strong>
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] uppercase text-on-surface-variant block font-medium">Parent Client</span>
+                    <span className="text-xs font-bold text-primary">{client?.name || 'Assigned Client'}</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-[10px] uppercase text-on-surface-variant block font-medium">GSTIN</span>
-                  <span className="font-mono font-medium text-on-surface">{entity.gstin || 'NOT REGISTERED'}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase text-on-surface-variant block font-medium">PF Est. Code</span>
-                  <span className="font-mono font-medium text-on-surface">{entity.pfEstablishmentCode || 'N/A'}</span>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase text-on-surface-variant block font-medium">ESIC Code</span>
-                  <span className="font-mono font-medium text-on-surface">{entity.esicRegistrationCode || 'N/A'}</span>
-                </div>
-              </div>
 
-              <div className="text-xs text-on-surface-variant">
-                <span className="text-[10px] uppercase text-on-surface-variant block font-medium">Registered Address</span>
-                <p className="mt-0.5">{entity.registeredAddress}</p>
+                <div className="grid grid-cols-2 gap-3 p-4 bg-surface-container-low rounded-lg text-xs">
+                  <div>
+                    <span className="text-[10px] uppercase text-on-surface-variant block font-medium">Corporate PAN</span>
+                    <span className="font-mono font-bold text-on-surface">{entity.panNumber || entity.pan || 'N/A'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-on-surface-variant block font-medium">GSTIN</span>
+                    <span className="font-mono font-medium text-on-surface">{entity.gstin || 'NOT REGISTERED'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-on-surface-variant block font-medium">PF Est. Code</span>
+                    <span className="font-mono font-medium text-on-surface">{entity.pfEstablishmentCode || 'N/A'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-on-surface-variant block font-medium">ESIC Code</span>
+                    <span className="font-mono font-medium text-on-surface">{entity.esicRegistrationCode || 'N/A'}</span>
+                  </div>
+                </div>
+
+                <div className="text-xs text-on-surface-variant">
+                  <span className="text-[10px] uppercase text-on-surface-variant block font-medium">Registered Address</span>
+                  <p className="mt-0.5">{entity.registeredAddress}</p>
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Add Legal Entity Modal */}
       {showAddModal && (
@@ -230,7 +296,7 @@ export const LegalEntitiesView: React.FC = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Suman Technologies & Retail Pvt Ltd"
+                  placeholder="e.g. Acme Global Services Pvt Ltd"
                   value={legalName}
                   onChange={(e) => setLegalName(e.target.value)}
                   className="w-full p-2 bg-surface-container-low rounded border border-outline-variant/30 text-on-surface"
@@ -242,7 +308,7 @@ export const LegalEntitiesView: React.FC = () => {
                   <label className="block text-on-surface-variant font-medium mb-1">Trade / Brand Name</label>
                   <input
                     type="text"
-                    placeholder="e.g. Suman Retail"
+                    placeholder="e.g. Acme Solutions"
                     value={tradeName}
                     onChange={(e) => setTradeName(e.target.value)}
                     className="w-full p-2 bg-surface-container-low rounded border border-outline-variant/30 text-on-surface"
