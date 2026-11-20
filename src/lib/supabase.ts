@@ -20,9 +20,13 @@ function getEnv(key: string): string | undefined {
   return undefined;
 }
 
-// Read public environment variables safely (prefixed with VITE_)
-const supabaseUrl = getEnv('VITE_SUPABASE_URL');
-const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY');
+// Live Project Default Supabase Credentials (Safe public publishable credentials)
+const DEFAULT_SUPABASE_URL = 'https://mlopgvkvzhwhkbewhefb.supabase.co';
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_CZCMyb2JJdj57VZ6SkG4yQ_-nGo2mIN';
+
+// Read public environment variables safely (prefixed with VITE_), falling back to live project defaults
+const supabaseUrl = getEnv('VITE_SUPABASE_URL') || DEFAULT_SUPABASE_URL;
+const supabaseAnonKey = getEnv('VITE_SUPABASE_ANON_KEY') || DEFAULT_SUPABASE_ANON_KEY;
 
 /**
  * Validates that environment variables are present and syntactically valid
