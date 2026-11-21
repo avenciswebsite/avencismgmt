@@ -270,6 +270,28 @@ class AppStore {
     return this.departments.filter(d => d.clientId === clientId);
   }
 
+  addDepartment(dept: { clientId: string; name: string; code: string }): Department {
+    const newDept: Department = {
+      id: `dept-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      clientId: dept.clientId,
+      name: dept.name,
+      code: dept.code,
+    };
+    this.departments.push(newDept);
+    this.saveToStorage();
+    return newDept;
+  }
+
+  deleteDepartment(deptId: string): boolean {
+    const idx = this.departments.findIndex(d => d.id === deptId);
+    if (idx !== -1) {
+      this.departments.splice(idx, 1);
+      this.saveToStorage();
+      return true;
+    }
+    return false;
+  }
+
   // --- Client Policies ---
   getClientPolicy(clientId: string): ClientPolicy {
     if (!this.policies[clientId]) {

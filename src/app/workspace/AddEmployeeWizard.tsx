@@ -19,7 +19,11 @@ import {
   CreditCard, 
   FileText,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  Plus,
+  X,
+  Layers,
+  Loader2
 } from 'lucide-react';
 
 export const AddEmployeeWizard: React.FC = () => {
@@ -68,6 +72,13 @@ export const AddEmployeeWizard: React.FC = () => {
 
   const [errorMsg, setErrorMsg] = useState('');
 
+  // Inline Quick Department Management
+  const [showAddDeptModal, setShowAddDeptModal] = useState(false);
+  const [inlineDeptName, setInlineDeptName] = useState('');
+  const [inlineDeptCode, setInlineDeptCode] = useState('');
+  const [isSavingInlineDept, setIsSavingInlineDept] = useState(false);
+  const [inlineDeptError, setInlineDeptError] = useState('');
+
   const userRole = currentUser?.role;
   const userClientId = currentUser?.clientId || effectiveClientId;
   const userEmpId = currentUser?.employeeId;
@@ -111,6 +122,73 @@ export const AddEmployeeWizard: React.FC = () => {
   useEffect(() => {
     loadMetadata();
   }, [loadMetadata]);
+
+  const handleQuickAddDepartment = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!effectiveClientId) return;
+    const trimmedName = inlineDeptName.trim();
+    if (!trimmedName) {
+      setInlineDeptError('Department name is required.');
+      return;
+    }
+    const codeToUse = inlineDeptCode.trim() 
+      ? inlineDeptCode.trim().toUpperCase() 
+      : trimmedName.substring(0, 4).toUpperCase();
+
+    setIsSavingInlineDept(true);
+    setInlineDeptError('');
+    try {
+      const res = await policyService.createDepartment({
+        client_id: effectiveClientId,
+        name: trimmedName,
+        code: codeToUse,
+      });
+
+      if (res.success && res.data) {
+        setDepartments(prev => [...prev, res.data!]);
+        setDepartmentId(res.data.id);
+        setShowAddDeptModal(false);
+        setInlineDeptName('');
+        setInlineDeptCode('');
+      } else {
+        setInlineDeptError(res.error?.message || 'Failed to create department.');
+      }
+    } catch (err: any) {
+      setInlineDeptError(err.message || 'Error creating department.');
+    } finally {
+      setIsSavingInlineDept(false);
+    }
+  };
+
+  const handleLoadStandardDepartments = async () => {
+    if (!effectiveClientId) return;
+    setIsSavingInlineDept(true);
+    try {
+      const standards = [
+        { name: 'Operations', code: 'OPS' },
+        { name: 'Human Resources', code: 'HR' },
+        { name: 'Engineering & IT', code: 'ENG' },
+        { name: 'Finance & Accounts', code: 'FIN' },
+        { name: 'Sales & Marketing', code: 'SALES' },
+        { name: 'General Administration', code: 'ADMIN' },
+      ];
+      const res = await policyService.createDepartmentsBatch(
+        standards.map(s => ({
+          client_id: effectiveClientId,
+          name: s.name,
+          code: s.code,
+        }))
+      );
+      if (res.success && res.data && res.data.length > 0) {
+        setDepartments(res.data);
+        setDepartmentId(res.data[0].id);
+      }
+    } catch (err) {
+      console.error('Failed to load standard departments:', err);
+    } finally {
+      setIsSavingInlineDept(false);
+    }
+  };
 
   const handleBackToDirectory = () => {
     const returnUrl = effectiveClientId ? `/workspace/${effectiveClientId}/employees` : '/workspace/employees';
@@ -418,18 +496,51 @@ export const AddEmployeeWizard: React.FC = () => {
               </div>
 
               <div>
-                <label className="font-bold text-on-surface block mb-1">Department</label>
-                <select
-                  value={departmentId}
-                  onChange={e => setDepartmentId(e.target.value)}
-                  className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high font-semibold"
-                >
-                  {departments.map(dept => (
-                    <option key={dept.id} value={dept.id}>
-                      {dept.name} ({dept.code})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-on-surface">Department</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInlineDeptError('');
+                      setShowAddDeptModal(true);
+                    }}
+                    className="text-xs font-bold text-accent hover:text-accent-hover flex items-center space-x-0.5"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Dept</span>
+                  </button>
+                </div>
+
+                {departments.length === 0 ? (
+                  <div className="p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-amber-800 dark:text-amber-300">
+                        No departments found.
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleLoadStandardDepartments}
+                        disabled={isSavingInlineDept}
+                        className="px-2 py-0.5 bg-amber-600 hover:bg-amber-700 text-white rounded text-[11px] font-bold transition-colors disabled:opacity-50"
+                      >
+                        {isSavingInlineDept ? 'Loading...' : '+ Load Defaults'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <select
+                    value={departmentId}
+                    onChange={e => setDepartmentId(e.target.value)}
+                    className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high font-semibold text-xs"
+                  >
+                    <option value="">Select Department...</option>
+                    {departments.map(dept => (
+                      <option key={dept.id} value={dept.id}>
+                        {dept.name} ({dept.code})
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
             </div>
 
@@ -665,6 +776,90 @@ export const AddEmployeeWizard: React.FC = () => {
                 </>
               )}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Add Department Modal */}
+      {showAddDeptModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-surface-container-lowest max-w-md w-full rounded-2xl border border-surface-container-high shadow-elevated overflow-hidden">
+            <div className="p-5 border-b border-surface-container-high flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Layers className="w-5 h-5 text-accent" />
+                <h3 className="font-bold text-base text-primary">Configure New Department</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddDeptModal(false)}
+                className="p-1 text-on-surface-variant hover:text-on-surface rounded-lg"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleQuickAddDepartment} className="p-5 space-y-4">
+              <div>
+                <label className="text-xs font-bold text-on-surface block mb-1">Department Name *</label>
+                <input
+                  type="text"
+                  value={inlineDeptName}
+                  onChange={e => {
+                    setInlineDeptName(e.target.value);
+                    if (!inlineDeptCode && e.target.value) {
+                      setInlineDeptCode(e.target.value.substring(0, 4).toUpperCase());
+                    }
+                  }}
+                  placeholder="e.g. Operations, IT, Finance"
+                  className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-on-surface block mb-1">Department Code *</label>
+                <input
+                  type="text"
+                  value={inlineDeptCode}
+                  onChange={e => setInlineDeptCode(e.target.value.toUpperCase())}
+                  placeholder="e.g. OPS, IT, FIN"
+                  className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs uppercase font-mono"
+                />
+              </div>
+
+              {inlineDeptError && (
+                <div className="p-2.5 bg-error/10 border border-error/20 rounded-lg text-xs font-semibold text-error">
+                  {inlineDeptError}
+                </div>
+              )}
+
+              <div className="pt-2 flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddDeptModal(false)}
+                  className="px-4 py-2 rounded-lg border border-surface-container-high text-xs font-bold text-on-surface hover:bg-surface-container-low"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingInlineDept || !inlineDeptName.trim()}
+                  className="flex items-center space-x-1.5 px-4 py-2 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold disabled:opacity-50"
+                >
+                  {isSavingInlineDept ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Create Department</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

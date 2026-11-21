@@ -15,8 +15,27 @@ import {
   Save, 
   AlertTriangle,
   Sparkles,
-  Loader2
+  Loader2,
+  Layers,
+  Plus,
+  Trash2,
+  RotateCcw,
+  Tag
 } from 'lucide-react';
+
+interface DepartmentDraft {
+  name: string;
+  code: string;
+}
+
+const DEFAULT_DEPARTMENTS: DepartmentDraft[] = [
+  { name: 'Operations', code: 'OPS' },
+  { name: 'Human Resources', code: 'HR' },
+  { name: 'Engineering & IT', code: 'ENG' },
+  { name: 'Finance & Accounts', code: 'FIN' },
+  { name: 'Sales & Marketing', code: 'SALES' },
+  { name: 'General Administration', code: 'ADMIN' },
+];
 
 export const ClientOnboardWizard: React.FC = () => {
   const navigate = useNavigate();
@@ -24,7 +43,7 @@ export const ClientOnboardWizard: React.FC = () => {
   const { switchClient, refreshWorkspace } = useWorkspace();
 
   const [step, setStep] = useState(1);
-  const totalSteps = 5;
+  const totalSteps = 6;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Step 1: Organisation Profile
@@ -50,7 +69,13 @@ export const ClientOnboardWizard: React.FC = () => {
   const [longitude, setLongitude] = useState('73.8567');
   const [radiusMeters, setRadiusMeters] = useState('200');
 
-  // Step 4: Initial Policy Configuration (The 20 Domains)
+  // Step 4: Operational Departments & Cost Centers
+  const [departmentsList, setDepartmentsList] = useState<DepartmentDraft[]>(DEFAULT_DEPARTMENTS);
+  const [newDeptName, setNewDeptName] = useState('');
+  const [newDeptCode, setNewDeptCode] = useState('');
+  const [deptFormError, setDeptFormError] = useState('');
+
+  // Step 5: Initial Policy Configuration (The 20 Domains)
   const [salaryDivisor, setSalaryDivisor] = useState<'26' | '30' | 'calendar_days'>('30');
   const [overtimeMethod, setOvertimeMethod] = useState<'multiplier' | 'flat_rate' | 'comp_off' | 'disabled'>('multiplier');
   const [overtimeRate, setOvertimeRate] = useState('1.5');
@@ -63,6 +88,37 @@ export const ClientOnboardWizard: React.FC = () => {
   // Status
   const [savedClientId, setSavedClientId] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const handleAddDepartment = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmedName = newDeptName.trim();
+    if (!trimmedName) {
+      setDeptFormError('Department name is required.');
+      return;
+    }
+    const codeToUse = newDeptCode.trim()
+      ? newDeptCode.trim().toUpperCase()
+      : trimmedName.substring(0, 4).toUpperCase();
+
+    if (departmentsList.some(d => d.code.toUpperCase() === codeToUse)) {
+      setDeptFormError(`Department code "${codeToUse}" is already in the list.`);
+      return;
+    }
+
+    setDepartmentsList([...departmentsList, { name: trimmedName, code: codeToUse }]);
+    setNewDeptName('');
+    setNewDeptCode('');
+    setDeptFormError('');
+  };
+
+  const handleRemoveDepartment = (codeToRemove: string) => {
+    setDepartmentsList(departmentsList.filter(d => d.code !== codeToRemove));
+  };
+
+  const handleResetDepartments = () => {
+    setDepartmentsList(DEFAULT_DEPARTMENTS);
+    setDeptFormError('');
+  };
 
   const handleCreateClient = async (activateNow = false) => {
     if (!name.trim() || !code.trim()) {
@@ -134,7 +190,23 @@ export const ClientOnboardWizard: React.FC = () => {
         }
       }
 
-      // 4. Save Policy Configuration
+      // 4. Add Departments
+      const deptsToCreate = departmentsList.length > 0 ? departmentsList : DEFAULT_DEPARTMENTS;
+      if (deptsToCreate.length > 0) {
+        const deptRes = await policyService.createDepartmentsBatch(
+          deptsToCreate.map(d => ({
+            client_id: createdClientId,
+            name: d.name.trim(),
+            code: d.code.toUpperCase().trim(),
+          }))
+        );
+
+        if (!deptRes.success) {
+          console.warn('[Avencis WFM] Department batch registration warning:', deptRes.error);
+        }
+      }
+
+      // 5. Save Policy Configuration
       await policyService.updateClientPolicy(createdClientId, {
         is_configured: true,
         salary_divisor: salaryDivisor,
@@ -151,7 +223,7 @@ export const ClientOnboardWizard: React.FC = () => {
       refreshWorkspace();
       await switchClient(createdClientId);
       setIsSubmitting(false);
-      setStep(5); // Completion Screen
+      setStep(6); // Completion Screen
     } catch (err: any) {
       setErrorMsg(err.message || 'An unexpected error occurred during client onboarding.');
       setIsSubmitting(false);
@@ -496,6 +568,147 @@ export const ClientOnboardWizard: React.FC = () => {
               onClick={() => setStep(4)}
               className="flex items-center space-x-2 px-5 py-2.5 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold transition-colors"
             >
+              <span>Continue to Departments</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 4: Operational Departments & Cost Centers */}
+      {step === 4 && (
+        <div className="bg-surface-container-lowest p-6 rounded-xl border border-surface-container-high shadow-card space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-surface-container-high">
+            <div className="flex items-center space-x-2">
+              <Layers className="w-5 h-5 text-accent" />
+              <h2 className="text-base font-serif font-bold text-primary">4. Operational Departments & Org Units</h2>
+            </div>
+            <span className="text-xs font-mono font-bold text-accent px-2 py-0.5 bg-accent/10 rounded">
+              {departmentsList.length} Configured
+            </span>
+          </div>
+
+          <div className="text-xs text-on-surface-variant bg-surface-container-low p-3 rounded-lg flex items-center justify-between">
+            <p>
+              <strong>Department Assignment:</strong> Every employee onboarded for this client is assigned to a department for roster management, leave approval routing, and payroll accounting.
+            </p>
+            <button
+              type="button"
+              onClick={handleResetDepartments}
+              className="ml-3 shrink-0 text-[11px] font-bold text-accent hover:text-accent-hover flex items-center space-x-1"
+              title="Reset to standard default departments"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset Standard Presets</span>
+            </button>
+          </div>
+
+          {/* Quick Add Department Form */}
+          <form onSubmit={handleAddDepartment} className="p-3.5 bg-surface-container-low rounded-lg border border-surface-container-high space-y-3">
+            <span className="text-xs font-bold text-primary block">Add New Department to Client</span>
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+              <div className="sm:col-span-7">
+                <label className="text-[11px] font-bold text-on-surface block mb-1">Department Name *</label>
+                <input
+                  type="text"
+                  value={newDeptName}
+                  onChange={e => {
+                    setNewDeptName(e.target.value);
+                    if (!newDeptCode && e.target.value) {
+                      setNewDeptCode(e.target.value.substring(0, 4).toUpperCase());
+                    }
+                  }}
+                  placeholder="e.g. Quality Assurance or Logistics"
+                  className="w-full px-3 py-2 bg-surface-container-lowest rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs"
+                />
+              </div>
+
+              <div className="sm:col-span-3">
+                <label className="text-[11px] font-bold text-on-surface block mb-1">Unique Code *</label>
+                <input
+                  type="text"
+                  value={newDeptCode}
+                  onChange={e => setNewDeptCode(e.target.value.toUpperCase())}
+                  placeholder="e.g. QA or LOG"
+                  className="w-full px-3 py-2 bg-surface-container-lowest rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs font-mono uppercase"
+                />
+              </div>
+
+              <div className="sm:col-span-2 flex items-end">
+                <button
+                  type="submit"
+                  className="w-full h-[34px] flex items-center justify-center space-x-1 px-3 bg-primary hover:bg-primary-dark text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Dept</span>
+                </button>
+              </div>
+            </div>
+
+            {deptFormError && (
+              <p className="text-[11px] font-semibold text-error flex items-center space-x-1">
+                <AlertTriangle className="w-3 h-3" />
+                <span>{deptFormError}</span>
+              </p>
+            )}
+          </form>
+
+          {/* Department List Grid */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-on-surface block">Configured Departments ({departmentsList.length})</label>
+            {departmentsList.length === 0 ? (
+              <div className="p-6 text-center border-2 border-dashed border-surface-container-high rounded-xl text-xs text-on-surface-variant">
+                <p>No departments configured. Employees will have no departments to select during onboarding.</p>
+                <button
+                  type="button"
+                  onClick={handleResetDepartments}
+                  className="mt-2 text-xs font-bold text-accent hover:underline"
+                >
+                  Load 6 Standard Departments Now
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-64 overflow-y-auto pr-1">
+                {departmentsList.map(dept => (
+                  <div
+                    key={dept.code}
+                    className="p-3 bg-surface-container-low border border-surface-container-high rounded-lg flex items-center justify-between group hover:border-accent/40 transition-colors"
+                  >
+                    <div className="min-w-0 pr-2">
+                      <div className="font-bold text-xs text-primary truncate">{dept.name}</div>
+                      <div className="font-mono text-[10px] text-on-surface-variant font-semibold tracking-wider">
+                        CODE: {dept.code}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveDepartment(dept.code)}
+                      className="p-1 text-on-surface-variant hover:text-error hover:bg-error/10 rounded transition-colors"
+                      title={`Remove ${dept.name}`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="pt-4 flex justify-between border-t border-surface-container-high">
+            <button
+              type="button"
+              onClick={() => setStep(3)}
+              className="flex items-center space-x-1.5 px-4 py-2 rounded-lg border border-surface-container-high text-xs font-bold text-on-surface"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setStep(5)}
+              className="flex items-center space-x-2 px-5 py-2.5 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold transition-colors"
+            >
               <span>Continue to Policy Engine</span>
               <ArrowRight className="w-4 h-4" />
             </button>
@@ -503,12 +716,12 @@ export const ClientOnboardWizard: React.FC = () => {
         </div>
       )}
 
-      {/* Step 4: Policy Configuration */}
-      {step === 4 && (
+      {/* Step 5: Policy Configuration */}
+      {step === 5 && (
         <div className="bg-surface-container-lowest p-6 rounded-xl border border-surface-container-high shadow-card space-y-4">
           <div className="flex items-center space-x-2 pb-2 border-b border-surface-container-high">
             <Sliders className="w-5 h-5 text-accent" />
-            <h2 className="text-base font-serif font-bold text-primary">4. Client Policy Configuration</h2>
+            <h2 className="text-base font-serif font-bold text-primary">5. Client Policy Configuration</h2>
           </div>
 
           <div className="text-xs text-on-surface-variant bg-surface-container-low p-3 rounded-lg">
@@ -602,7 +815,7 @@ export const ClientOnboardWizard: React.FC = () => {
 
           <div className="pt-4 flex justify-between">
             <button
-              onClick={() => setStep(3)}
+              onClick={() => setStep(4)}
               className="flex items-center space-x-1.5 px-4 py-2 rounded-lg border border-surface-container-high text-xs font-bold text-on-surface"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -640,8 +853,8 @@ export const ClientOnboardWizard: React.FC = () => {
         </div>
       )}
 
-      {/* Step 5: Success & Handover */}
-      {step === 5 && (
+      {/* Step 6: Success & Handover */}
+      {step === 6 && (
         <div className="bg-surface-container-lowest p-8 rounded-xl border border-surface-container-high shadow-elevated text-center space-y-4">
           <div className="w-14 h-14 rounded-full bg-success/10 text-success mx-auto flex items-center justify-center">
             <CheckCircle2 className="w-8 h-8" />

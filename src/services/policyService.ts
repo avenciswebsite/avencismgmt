@@ -18,6 +18,8 @@ import {
   WorkLocationRow,
   WorkLocationInsert,
   DepartmentRow,
+  DepartmentInsert,
+  DepartmentUpdate,
   ClientPolicyRow,
   ClientPolicyUpdate,
   ClientCardSummary,
@@ -250,6 +252,142 @@ export const policyService = {
       return successResponse(data || []);
     } catch (err) {
       return errorResponse(handleSupabaseError(err, 'policyService.getDepartments'));
+    }
+  },
+
+  /**
+   * Creates a single operational department for a client organization.
+   */
+  async createDepartment(departmentData: DepartmentInsert): Promise<ServiceResponse<DepartmentRow>> {
+    if (!departmentData.client_id) {
+      return errorResponse(createValidationError('Client ID is required.', 'client_id'));
+    }
+    if (!departmentData.name || departmentData.name.trim().length < 2) {
+      return errorResponse(createValidationError('Department name must be at least 2 characters.', 'name'));
+    }
+    if (!departmentData.code || departmentData.code.trim().length < 1) {
+      return errorResponse(createValidationError('Department code is required.', 'code'));
+    }
+
+    if (isMockMode()) {
+      const created = store.addDepartment({
+        clientId: departmentData.client_id,
+        name: departmentData.name.trim(),
+        code: departmentData.code.trim().toUpperCase(),
+      });
+      return successResponse({
+        id: created.id,
+        client_id: created.clientId,
+        name: created.name,
+        code: created.code,
+        head_employee_id: null,
+        created_at: new Date().toISOString(),
+      });
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('departments')
+        .insert({
+          client_id: departmentData.client_id,
+          name: departmentData.name.trim(),
+          code: departmentData.code.trim().toUpperCase(),
+          head_employee_id: departmentData.head_employee_id || null,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        return errorResponse(handleSupabaseError(error, 'policyService.createDepartment'));
+      }
+
+      return successResponse(data);
+    } catch (err) {
+      return errorResponse(handleSupabaseError(err, 'policyService.createDepartment'));
+    }
+  },
+
+  /**
+   * Creates multiple operational departments in batch for a client organization.
+   */
+  async createDepartmentsBatch(departments: DepartmentInsert[]): Promise<ServiceResponse<DepartmentRow[]>> {
+    if (!departments || departments.length === 0) {
+      return successResponse([]);
+    }
+
+    const clientId = departments[0]?.client_id;
+    if (!clientId) {
+      return errorResponse(createValidationError('Client ID is required for department batch creation.', 'client_id'));
+    }
+
+    if (isMockMode()) {
+      const createdRows = departments.map(d => {
+        const created = store.addDepartment({
+          clientId: d.client_id,
+          name: d.name.trim(),
+          code: d.code.trim().toUpperCase(),
+        });
+        return {
+          id: created.id,
+          client_id: created.clientId,
+          name: created.name,
+          code: created.code,
+          head_employee_id: null,
+          created_at: new Date().toISOString(),
+        };
+      });
+      return successResponse(createdRows);
+    }
+
+    try {
+      const payload = departments.map(d => ({
+        client_id: d.client_id,
+        name: d.name.trim(),
+        code: d.code.trim().toUpperCase(),
+        head_employee_id: d.head_employee_id || null,
+      }));
+
+      const { data, error } = await supabase
+        .from('departments')
+        .upsert(payload, { onConflict: 'client_id,code' })
+        .select();
+
+      if (error) {
+        return errorResponse(handleSupabaseError(error, 'policyService.createDepartmentsBatch'));
+      }
+
+      return successResponse(data || []);
+    } catch (err) {
+      return errorResponse(handleSupabaseError(err, 'policyService.createDepartmentsBatch'));
+    }
+  },
+
+  /**
+   * Deletes a department by ID.
+   */
+  async deleteDepartment(departmentId: string): Promise<ServiceResponse<boolean>> {
+    if (!departmentId) {
+      return errorResponse(createValidationError('Department ID is required.', 'departmentId'));
+    }
+
+    if (isMockMode()) {
+      const removed = store.deleteDepartment(departmentId);
+      return successResponse(removed);
+    }
+
+    try {
+      const { error } = await supabase
+        .from('departments')
+        .delete()
+        .eq('id', departmentId);
+
+      if (error) {
+        return errorResponse(handleSupabaseError(error, 'policyService.deleteDepartment'));
+      }
+
+      return successResponse(true);
+    } catch (err) {
+      return errorResponse(handleSupabaseError(err, 'policyService.deleteDepartment'));
     }
   },
 

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { policyService } from '../../services/policyService';
+import { DepartmentRow } from '../../services/serviceTypes';
 import { 
   Building2, 
   MapPin, 
@@ -14,11 +15,16 @@ import {
   CheckCircle2, 
   AlertCircle, 
   RefreshCw, 
-  FileText,
-  Briefcase,
-  Layers,
-  Sliders,
-  ArrowLeft
+  FileText, 
+  Briefcase, 
+  Layers, 
+  Sliders, 
+  ArrowLeft,
+  Plus,
+  Trash2,
+  RotateCcw,
+  AlertTriangle,
+  Loader2
 } from 'lucide-react';
 
 export const OrganizationProfileView: React.FC = () => {
@@ -45,6 +51,115 @@ export const OrganizationProfileView: React.FC = () => {
 
   const [isSaving, setIsSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  // Departments State
+  const effectiveClientId = activeClient?.id || clientId;
+  const [departments, setDepartments] = useState<DepartmentRow[]>([]);
+  const [isLoadingDepts, setIsLoadingDepts] = useState(false);
+  const [newDeptName, setNewDeptName] = useState('');
+  const [newDeptCode, setNewDeptCode] = useState('');
+  const [deptFeedback, setDeptFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [isAddingDept, setIsAddingDept] = useState(false);
+
+  const loadDepartments = useCallback(async () => {
+    if (!effectiveClientId) return;
+    setIsLoadingDepts(true);
+    try {
+      const res = await policyService.getDepartments(effectiveClientId);
+      if (res.success && res.data) {
+        setDepartments(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load departments:', err);
+    } finally {
+      setIsLoadingDepts(false);
+    }
+  }, [effectiveClientId]);
+
+  useEffect(() => {
+    loadDepartments();
+  }, [loadDepartments]);
+
+  const handleAddDept = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!effectiveClientId) return;
+    const trimmed = newDeptName.trim();
+    if (!trimmed) {
+      setDeptFeedback({ type: 'error', message: 'Department name is required.' });
+      return;
+    }
+    const code = newDeptCode.trim() ? newDeptCode.trim().toUpperCase() : trimmed.substring(0, 4).toUpperCase();
+    setIsAddingDept(true);
+    setDeptFeedback(null);
+    try {
+      const res = await policyService.createDepartment({
+        client_id: effectiveClientId,
+        name: trimmed,
+        code,
+      });
+      if (res.success && res.data) {
+        setDepartments(prev => [...prev, res.data!]);
+        setNewDeptName('');
+        setNewDeptCode('');
+        setDeptFeedback({ type: 'success', message: `Department "${trimmed}" created successfully.` });
+        refreshWorkspace();
+      } else {
+        setDeptFeedback({ type: 'error', message: res.error?.message || 'Failed to create department.' });
+      }
+    } catch (err: any) {
+      setDeptFeedback({ type: 'error', message: err.message || 'Error creating department.' });
+    } finally {
+      setIsAddingDept(false);
+    }
+  };
+
+  const handleDeleteDept = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete the department "${name}"?`)) return;
+    try {
+      const res = await policyService.deleteDepartment(id);
+      if (res.success) {
+        setDepartments(prev => prev.filter(d => d.id !== id));
+        setDeptFeedback({ type: 'success', message: `Department "${name}" deleted.` });
+        refreshWorkspace();
+      } else {
+        setDeptFeedback({ type: 'error', message: res.error?.message || 'Failed to delete department.' });
+      }
+    } catch (err: any) {
+      setDeptFeedback({ type: 'error', message: err.message || 'Error deleting department.' });
+    }
+  };
+
+  const handleSeedDefaults = async () => {
+    if (!effectiveClientId) return;
+    setIsAddingDept(true);
+    setDeptFeedback(null);
+    try {
+      const standards = [
+        { name: 'Operations', code: 'OPS' },
+        { name: 'Human Resources', code: 'HR' },
+        { name: 'Engineering & IT', code: 'ENG' },
+        { name: 'Finance & Accounts', code: 'FIN' },
+        { name: 'Sales & Marketing', code: 'SALES' },
+        { name: 'General Administration', code: 'ADMIN' },
+      ];
+      const res = await policyService.createDepartmentsBatch(
+        standards.map(s => ({
+          client_id: effectiveClientId,
+          name: s.name,
+          code: s.code,
+        }))
+      );
+      if (res.success && res.data) {
+        setDepartments(res.data);
+        setDeptFeedback({ type: 'success', message: 'Standard departments created successfully.' });
+        refreshWorkspace();
+      }
+    } catch (err: any) {
+      setDeptFeedback({ type: 'error', message: err.message || 'Error creating standard departments.' });
+    } finally {
+      setIsAddingDept(false);
+    }
+  };
 
   // Sync state when active client changes
   useEffect(() => {
@@ -493,6 +608,153 @@ export const OrganizationProfileView: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* SECTION 5: Operational Departments & Cost Centers */}
+        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <Layers className="w-5 h-5 text-accent" />
+              </div>
+              <div>
+                <h2 className="font-serif text-lg font-bold text-primary">
+                  Operational Departments &amp; Cost Centers
+                </h2>
+                <p className="text-xs text-on-surface-variant">
+                  Configure client departments for staff deployment, shift assignments, and payroll grouping.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold text-primary px-2.5 py-1 bg-surface-container rounded-lg border border-outline-variant/30">
+                {departments.length} {departments.length === 1 ? 'Department' : 'Departments'}
+              </span>
+              {departments.length === 0 && (
+                <button
+                  type="button"
+                  onClick={handleSeedDefaults}
+                  disabled={isAddingDept}
+                  className="py-1.5 px-3 bg-accent text-white font-semibold text-xs rounded-lg hover:bg-accent-hover transition-colors flex items-center gap-1 shadow-sm disabled:opacity-50"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Load Standard Presets</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {deptFeedback && (
+            <div
+              className={`p-3 rounded-lg text-xs font-semibold flex items-center gap-2 ${
+                deptFeedback.type === 'success'
+                  ? 'bg-success/10 text-success border border-success/20'
+                  : 'bg-error/10 text-error border border-error/20'
+              }`}
+            >
+              {deptFeedback.type === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+              ) : (
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+              )}
+              <span>{deptFeedback.message}</span>
+            </div>
+          )}
+
+          {/* Quick Add Form */}
+          <form onSubmit={handleAddDept} className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/20 space-y-3">
+            <span className="text-xs font-bold text-primary block">Create New Department</span>
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+              <div className="sm:col-span-7">
+                <label className="text-[11px] font-bold text-on-surface block mb-1">Department Name *</label>
+                <input
+                  type="text"
+                  value={newDeptName}
+                  onChange={e => {
+                    setNewDeptName(e.target.value);
+                    if (!newDeptCode && e.target.value) {
+                      setNewDeptCode(e.target.value.substring(0, 4).toUpperCase());
+                    }
+                  }}
+                  placeholder="e.g. Quality Assurance, Supply Chain"
+                  className="w-full px-3 py-2 bg-surface-container-lowest rounded-lg border border-outline-variant/40 text-xs focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              <div className="sm:col-span-3">
+                <label className="text-[11px] font-bold text-on-surface block mb-1">Code (Optional)</label>
+                <input
+                  type="text"
+                  value={newDeptCode}
+                  onChange={e => setNewDeptCode(e.target.value.toUpperCase())}
+                  placeholder="e.g. QA, SC"
+                  className="w-full px-3 py-2 bg-surface-container-lowest rounded-lg border border-outline-variant/40 text-xs font-mono uppercase focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              <div className="sm:col-span-2 flex items-end">
+                <button
+                  type="submit"
+                  disabled={isAddingDept || !newDeptName.trim()}
+                  className="w-full h-[34px] flex items-center justify-center gap-1 px-3 bg-primary hover:bg-primary-dark text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-50 shadow-sm"
+                >
+                  {isAddingDept ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Dept</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </form>
+
+          {/* Department Cards Grid */}
+          {isLoadingDepts ? (
+            <div className="p-6 text-center text-xs text-on-surface-variant flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-accent" />
+              <span>Loading departments...</span>
+            </div>
+          ) : departments.length === 0 ? (
+            <div className="p-6 text-center border-2 border-dashed border-outline-variant/30 rounded-xl text-xs text-on-surface-variant space-y-2">
+              <p>No operational departments have been configured for this client yet.</p>
+              <button
+                type="button"
+                onClick={handleSeedDefaults}
+                disabled={isAddingDept}
+                className="px-3 py-1.5 bg-primary text-white rounded-lg font-bold text-xs hover:bg-primary-dark transition-colors"
+              >
+                + Load 6 Standard Departments Now
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {departments.map(dept => (
+                <div
+                  key={dept.id}
+                  className="p-3.5 bg-surface-container-low rounded-xl border border-outline-variant/20 flex items-center justify-between hover:border-accent/40 transition-colors group"
+                >
+                  <div className="min-w-0 pr-2">
+                    <div className="font-bold text-xs text-primary truncate">{dept.name}</div>
+                    <div className="font-mono text-[10px] text-on-surface-variant font-semibold">
+                      CODE: <span className="text-accent font-bold">{dept.code}</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteDept(dept.id, dept.name)}
+                    className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error/10 rounded-lg transition-colors"
+                    title={`Delete ${dept.name}`}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}
