@@ -115,6 +115,8 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
 
   // Payslip Modal state
   const [selectedPayslipMonth, setSelectedPayslipMonth] = useState<string | null>(null);
+  const [publishedPayslips, setPublishedPayslips] = useState<PayslipRow[]>([]);
+  const [portalPayrollItem, setPortalPayrollItem] = useState<any>(null);
 
   // Data retrieval
   const [employees, setEmployees] = useState<any[]>([]);
@@ -293,6 +295,25 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
   useEffect(() => {
     loadLiveAttendance();
   }, [loadLiveAttendance]);
+
+  useEffect(() => {
+    if (!effectiveClientId || !currentEmp?.id) return;
+    payrollService.getPayslips({ clientId: effectiveClientId, employeeId: currentEmp.id }).then(res => {
+      if (res.success && res.data) {
+        setPublishedPayslips(res.data);
+      }
+    });
+  }, [effectiveClientId, currentEmp?.id]);
+
+  useEffect(() => {
+    if (!currentEmp?.id || !selectedPayslipMonth) return;
+    const monthNum = selectedPayslipMonth.includes('October') ? 10 : selectedPayslipMonth.includes('November') ? 11 : 9;
+    payrollService.getPublishedPayslip(currentEmp.id, monthNum, 2026).then(res => {
+      if (res.success && res.data?.item) {
+        setPortalPayrollItem(res.data.item);
+      }
+    });
+  }, [selectedPayslipMonth, currentEmp?.id]);
 
   if (isLoadingWorkspace || isLoadingEmployees) {
     return (
@@ -506,28 +527,6 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
   };
 
   // Salary breakdown for Payslip preview & published payslips
-  const [publishedPayslips, setPublishedPayslips] = useState<PayslipRow[]>([]);
-  const [portalPayrollItem, setPortalPayrollItem] = useState<any>(null);
-
-  useEffect(() => {
-    if (!currentClient?.id || !currentEmp?.id) return;
-    payrollService.getPayslips({ clientId: currentClient.id, employeeId: currentEmp.id }).then(res => {
-      if (res.success && res.data) {
-        setPublishedPayslips(res.data);
-      }
-    });
-  }, [currentClient?.id, currentEmp?.id]);
-
-  useEffect(() => {
-    if (!currentEmp?.id || !selectedPayslipMonth) return;
-    const monthNum = selectedPayslipMonth.includes('October') ? 10 : selectedPayslipMonth.includes('November') ? 11 : 9;
-    payrollService.getPublishedPayslip(currentEmp.id, monthNum, 2026).then(res => {
-      if (res.success && res.data?.item) {
-        setPortalPayrollItem(res.data.item);
-      }
-    });
-  }, [selectedPayslipMonth, currentEmp?.id]);
-
   let calendarDays = 30;
   let paidDays = 30;
   let unpaidDays = 0;
@@ -536,8 +535,8 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
   let conveyance = 1600;
   let specialAllowance = 0;
   let overtimePay = 0;
-  let variableIncentives = currentEmp.variableIncentive || 0;
-  let otherAllowances = currentEmp.otherAllowances || 0;
+  let variableIncentives = currentEmp?.variableIncentive || 0;
+  let otherAllowances = currentEmp?.otherAllowances || 0;
   let grossEarnings = 0;
   let pf = 0;
   let esi = 0;
@@ -567,7 +566,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
   } else {
     calendarDays = getDaysInMonth(10, 2026);
     const empAtt: any[] = [];
-    const attSummary = aggregateMonthlyAttendance(empAtt, 10, 2026, currentEmp.joiningDate);
+    const attSummary = aggregateMonthlyAttendance(empAtt, 10, 2026, currentEmp?.joiningDate || '2026-11-01');
     paidDays = attSummary.paidDays;
     unpaidDays = attSummary.unpaidDays;
 
