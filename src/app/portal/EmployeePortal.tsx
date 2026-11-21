@@ -20,6 +20,7 @@ import {
   ShieldCheck, 
   CheckCircle2, 
   AlertCircle, 
+  AlertTriangle, 
   MapPin, 
   Printer, 
   Download, 
@@ -88,7 +89,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
 
   // Punch state
   const [isPunching, setIsPunching] = useState<boolean>(false);
-  const [punchFeedback, setPunchFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [punchFeedback, setPunchFeedback] = useState<{ type: 'success' | 'error' | 'warning'; message: string } | null>(null);
   const [portalCoords, setPortalCoords] = useState<{ lat: number; lng: number }>({ lat: 18.5204, lng: 73.8567 });
   const [portalAccuracy, setPortalAccuracy] = useState<number>(8.5);
   const [liveMuster, setLiveMuster] = useState<any>(null);
@@ -230,6 +231,18 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
   }));
   const assignedLocation = currentEmp ? (activeLocations.find(l => l.id === currentEmp.workLocationId) || activeLocations[0]) : undefined;
   const policy = clientPolicy;
+
+  // Real-time Geofence distance calculation against assigned work location
+  const geofenceEval = useMemo(() => {
+    if (!assignedLocation || !assignedLocation.latitude || !portalCoords.lat) {
+      return { isWithinGeofence: true, distanceMeters: 0, geofenceStatus: 'WITHIN_GEOFENCE' as const };
+    }
+    const radius = (assignedLocation as any).radiusMeters || (assignedLocation as any).radius_meters || 150;
+    return attendanceService.evaluateGeofence(
+      { latitude: portalCoords.lat, longitude: portalCoords.lng },
+      { latitude: assignedLocation.latitude, longitude: assignedLocation.longitude, radius_meters: radius }
+    );
+  }, [assignedLocation, portalCoords]);
 
   const currentClientId = effectiveClientId;
   const currentEmpId = currentEmp?.id;
@@ -405,9 +418,16 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
       }, callerScope);
 
       if (res.data) {
+        const isOutOfFence = (res.data.event as any)?.geofence_status === 'OUT_OF_BOUNDS' || (res.data.event as any)?.geofenceStatus === 'OUT_OF_BOUNDS';
+        const distStr = geofenceEval.distanceMeters >= 1000 
+          ? `${(geofenceEval.distanceMeters / 1000).toFixed(1)} km` 
+          : `${geofenceEval.distanceMeters}m`;
+
         setPunchFeedback({
-          type: 'success',
-          message: `Official ${type === 'CHECK_IN' ? 'Check-In' : 'Check-Out'} recorded successfully at ${currentTime} with GPS validation.`
+          type: isOutOfFence ? 'warning' : 'success',
+          message: isOutOfFence
+            ? `Official ${type === 'CHECK_IN' ? 'Check-In' : 'Check-Out'} recorded at ${currentTime}. Note: You are ${distStr} outside the geofence perimeter for ${assignedLocation?.name || 'assigned facility'}; this punch has been flagged as an exception for supervisor review.`
+            : `Official ${type === 'CHECK_IN' ? 'Check-In' : 'Check-Out'} recorded successfully at ${currentTime} with GPS validation.`
         });
         await loadLiveAttendance();
       } else {
@@ -725,10 +745,14 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
               <div className={`p-4 rounded-xl text-xs flex items-center gap-3 border ${
                 punchFeedback.type === 'success' 
                   ? 'bg-emerald-50 text-emerald-900 border-emerald-200' 
+                  : punchFeedback.type === 'warning'
+                  ? 'bg-amber-50 text-amber-900 border-amber-200'
                   : 'bg-red-50 text-red-900 border-red-200'
               }`}>
                 {punchFeedback.type === 'success' ? (
                   <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                ) : punchFeedback.type === 'warning' ? (
+                  <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
                 ) : (
                   <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
                 )}
@@ -768,18 +792,23 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                         <MapPin className="w-4 h-4 text-emerald-600" />
                         <span>{assignedLocation?.name || 'Authorized Fleet Depot'}</span>
                       </div>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                        Inside Geofence Radius
-                      </span>
+                      {geofenceEval.isWithinGeofence ? (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                          Inside Geofence Radius
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
+                          Outside Geofence ({geofenceEval.distanceMeters >= 1000 ? `${(geofenceEval.distanceMeters / 1000).toFixed(1)} km` : `${geofenceEval.distanceMeters}m`} away)
+                        </span>
+                      )}
                     </div>
                     <p className="text-[11px] text-on-surface-variant">
-                      {assignedLocation?.address || 'Plot 42, Hadapsar Industrial Area, Pune 411028'}
+                      {assignedLocation?.address || (assignedLocation as any)?.address_line1 || 'Authorized Workplace Depot'}
                     </p>
                     <div className="flex flex-wrap items-center gap-4 text-[11px] font-mono text-on-surface-variant pt-1 border-t border-outline-variant/20">
-                      <span>Lat: {assignedLocation?.latitude || '18.5204'}° N</span>
-                      <span>Lng: {assignedLocation?.longitude || '73.8567'}° E</span>
-                      <span>Accuracy: ±8.5m</span>
-                      <span>Radius: {assignedLocation?.radiusMeters || 100}m</span>
+                      <span>Device GPS: {portalCoords.lat.toFixed(4)}° N, {portalCoords.lng.toFixed(4)}° E</span>
+                      <span>Accuracy: ±{portalAccuracy}m</span>
+                      <span>Site Radius: {(assignedLocation as any)?.radiusMeters || (assignedLocation as any)?.radius_meters || 1000}m</span>
                     </div>
                   </div>
 
