@@ -608,7 +608,10 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
           return (
             <button
               key={t.key}
-              onClick={() => setActiveTab(t.key as any)}
+              onClick={() => {
+                setActiveTab(t.key as any);
+                navigate(`/portal/${t.key === 'punch' ? 'punch' : t.key}`, { replace: true });
+              }}
               className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all ${
                 isActive
                   ? 'bg-primary text-white shadow-sm ring-1 ring-primary'

@@ -35,34 +35,62 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
   const isSuperAdmin = currentUser?.role === 'super_admin';
   const isEmployee = currentUser?.role === 'employee';
   const isInClientWorkspace = location.pathname.startsWith('/workspace');
+  const path = location.pathname.toLowerCase();
 
+  // Helper for consistent navigation item styling with prominent active highlighting
+  const getNavItemClasses = (isActive: boolean) =>
+    `group flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all select-none ${
+      isActive
+        ? 'bg-accent text-white shadow-md ring-1 ring-white/20'
+        : 'text-white/75 hover:bg-white/10 hover:text-white font-medium'
+    }`;
+
+  const getIconClasses = (isActive: boolean) =>
+    `w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-white/70 group-hover:text-white'}`;
+
+  // Employee Portal Navigation
   if (isEmployee) {
+    const isPortalHome = path === '/portal' || path === '/portal/employee';
+    const isPortalPunch = path === '/portal/punch' || path === '/portal/check-in';
+    const isPortalLeave = path.includes('/portal/leave');
+    const isPortalRegularisation = path.includes('/portal/regularisation');
+    const isPortalPayslips = path.includes('/portal/payslip');
+    const isPortalPolicies = path.includes('/portal/polic');
+
     return (
       <aside className={`${collapsed ? 'w-20' : 'w-64'} bg-primary-dark text-white flex flex-col shrink-0 border-r border-primary-active select-none transition-all duration-200`}>
         {/* Brand Header */}
         <div className={`p-4 border-b border-white/10 ${collapsed ? 'flex flex-col items-center' : ''}`}>
           {collapsed ? (
-            <div className="flex items-center justify-center p-1" title="Avencis Portal">
+            <NavLink
+              to="/portal"
+              className="flex items-center justify-center p-1 group focus:outline-none"
+              title="Avencis Portal"
+            >
               <img
                 src={avencisSymbolDarkBg}
                 alt="Avencis"
-                className="w-8 h-8 object-contain"
+                className="w-8 h-8 object-contain group-hover:scale-105 transition-transform"
               />
-            </div>
+            </NavLink>
           ) : (
             <div>
-              <div className="flex items-center gap-2.5">
+              <NavLink
+                to="/portal"
+                className="flex items-center gap-3 group focus:outline-none"
+                title="Avencis Self-Service Portal"
+              >
                 <img
                   src={avencisSymbolDarkBg}
                   alt="Avencis Symbol"
-                  className="h-7 w-auto object-contain shrink-0"
+                  className="h-7 w-auto max-w-[36px] object-contain shrink-0 group-hover:scale-105 transition-transform"
                 />
                 <img
                   src={avencisWordmark}
                   alt="Avencis"
-                  className="h-4.5 w-auto object-contain brightness-0 invert shrink-0"
+                  className="h-[20px] w-auto max-w-[120px] object-contain brightness-0 invert shrink-0"
                 />
-              </div>
+              </NavLink>
               <div className="mt-2.5 px-0.5 flex items-center justify-between">
                 <span className="text-[10px] font-mono tracking-widest uppercase text-white/70 font-semibold">
                   Self-Service Portal
@@ -84,75 +112,51 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
           <NavLink
             to="/portal"
             end
-            className={({ isActive }) =>
-              `flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-              }`
-            }
+            className={() => getNavItemClasses(isPortalHome)}
           >
-            <Home className="w-4 h-4" />
+            <Home className={getIconClasses(isPortalHome)} />
             <span>Employee Home</span>
           </NavLink>
 
           <NavLink
             to="/portal/punch"
-            className={({ isActive }) =>
-              `flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-              }`
-            }
+            className={() => getNavItemClasses(isPortalPunch)}
           >
-            <Clock className="w-4 h-4" />
+            <Clock className={getIconClasses(isPortalPunch)} />
             <span>Attendance & Punch</span>
           </NavLink>
 
           <NavLink
             to="/portal/leave"
-            className={({ isActive }) =>
-              `flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-              }`
-            }
+            className={() => getNavItemClasses(isPortalLeave)}
           >
-            <FileText className="w-4 h-4" />
+            <FileText className={getIconClasses(isPortalLeave)} />
             <span>Leave Requests & Balances</span>
           </NavLink>
 
           <NavLink
             to="/portal/regularisations"
-            className={({ isActive }) =>
-              `flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-              }`
-            }
+            className={() => getNavItemClasses(isPortalRegularisation)}
           >
-            <ShieldCheck className="w-4 h-4" />
+            <ShieldCheck className={getIconClasses(isPortalRegularisation)} />
             <span>Regularisations</span>
           </NavLink>
 
           <NavLink
             to="/portal/payslips"
             end
-            className={({ isActive }) =>
-              `flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-              }`
-            }
+            className={() => getNavItemClasses(isPortalPayslips)}
           >
-            <Receipt className="w-4 h-4" />
+            <Receipt className={getIconClasses(isPortalPayslips)} />
             <span>My Payslips</span>
           </NavLink>
 
           <NavLink
             to="/portal/policies"
             end
-            className={({ isActive }) =>
-              `flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-              }`
-            }
+            className={() => getNavItemClasses(isPortalPolicies)}
           >
-            <Sliders className="w-4 h-4" />
+            <Sliders className={getIconClasses(isPortalPolicies)} />
             <span>Company Policies</span>
           </NavLink>
         </nav>
@@ -160,32 +164,66 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
     );
   }
 
+  // Active state evaluators for Master Admin Platform Governance
+  const isMasterDashboardActive = path === '/' || path === '/admin' || path === '/admin/dashboard';
+  const isClientsDirectoryActive = (path.startsWith('/admin/clients') || path === '/clients') && !path.includes('/onboard') && !path.includes('/new');
+  const isOnboardActive = path.includes('/onboard') || path.includes('/clients/new');
+  const isEntitiesActive = path.startsWith('/admin/entities') || path.startsWith('/entities');
+  const isLocationsActive = path === '/admin/locations' || path === '/locations';
+  const isUsersActive = path.startsWith('/admin/users') || path.startsWith('/users');
+  const isPermissionsActive = path.startsWith('/admin/permissions') || path.startsWith('/permissions');
+  const isAuditActive = path.startsWith('/admin/audit') || path.startsWith('/audit');
+
+  // Active state evaluators for Client Workspace
+  const effectiveClientId = activeClientId || activeClient?.id;
+  const isClientOverviewActive = path === '/workspace' || 
+    path === '/workspace/overview' || 
+    (Boolean(effectiveClientId) && (path === `/workspace/${effectiveClientId?.toLowerCase()}` || path === `/workspace/${effectiveClientId?.toLowerCase()}/overview`));
+  const isWorkspaceEmployeesActive = path.includes('/workspace') && path.includes('/employee');
+  const isWorkspaceAttendanceActive = path.includes('/workspace') && path.includes('/attendance') && !path.includes('/regularisation');
+  const isWorkspaceRegularisationActive = path.includes('/workspace') && path.includes('/regularisation');
+  const isWorkspaceLeaveActive = path.includes('/workspace') && (path.includes('/leave') || path.includes('/leaves'));
+  const isWorkspacePayrollActive = path.includes('/workspace') && path.includes('/payroll') && !path.includes('/payslip');
+  const isWorkspacePayslipsActive = path.includes('/workspace') && path.includes('/payslip');
+  const isWorkspaceOrgActive = path.includes('/workspace') && path.includes('/organization');
+  const isWorkspaceLocationsActive = path.includes('/workspace') && path.includes('/location');
+  const isWorkspacePolicyActive = path.includes('/workspace') && (path.includes('/settings') || path.includes('/polic'));
+  const isWorkspaceReportsActive = path.includes('/workspace') && path.includes('/report');
+
   return (
     <aside className={`${collapsed ? 'w-20' : 'w-64'} bg-primary text-white flex flex-col shrink-0 border-r border-primary-active select-none transition-all duration-200`}>
       {/* Brand Header */}
       <div className={`p-4 border-b border-white/10 ${collapsed ? 'flex flex-col items-center' : ''}`}>
         {collapsed ? (
-          <div className="flex items-center justify-center p-1" title="Avencis WFM">
+          <NavLink
+            to="/admin/dashboard"
+            className="flex items-center justify-center p-1 group focus:outline-none"
+            title="Avencis WFM"
+          >
             <img
               src={avencisSymbolDarkBg}
               alt="Avencis"
-              className="w-8 h-8 object-contain"
+              className="w-8 h-8 object-contain group-hover:scale-105 transition-transform"
             />
-          </div>
+          </NavLink>
         ) : (
           <div>
-            <div className="flex items-center gap-2.5">
+            <NavLink
+              to="/admin/dashboard"
+              className="flex items-center gap-3 group focus:outline-none"
+              title="Avencis Master Administration"
+            >
               <img
                 src={avencisSymbolDarkBg}
                 alt="Avencis Symbol"
-                className="h-7 w-auto object-contain shrink-0"
+                className="h-7 w-auto max-w-[36px] object-contain shrink-0 group-hover:scale-105 transition-transform"
               />
               <img
                 src={avencisWordmark}
                 alt="Avencis"
-                className="h-4.5 w-auto object-contain brightness-0 invert shrink-0"
+                className="h-[20px] w-auto max-w-[120px] object-contain brightness-0 invert shrink-0"
               />
-            </div>
+            </NavLink>
             <div className="mt-2.5 px-0.5 flex items-center justify-between">
               <span className="text-[10px] font-mono tracking-widest uppercase text-white/70 font-semibold">
                 {isInClientWorkspace ? 'Client Workspace' : 'Master Admin'}
@@ -210,7 +248,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
           {isSuperAdmin && (
             <NavLink
-              to="/admin"
+              to="/admin/dashboard"
               className="mt-2 text-[11px] text-accent hover:text-accent-light font-bold flex items-center space-x-1 transition-colors"
             >
               <ArrowLeft className="w-3 h-3" />
@@ -235,93 +273,58 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
             </div>
 
             <NavLink
-              to={`/workspace/${activeClientId}`}
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              to={effectiveClientId ? `/workspace/${effectiveClientId}` : '/workspace/overview'}
+              className={() => getNavItemClasses(isClientOverviewActive)}
             >
-              <Home className="w-4 h-4" />
+              <Home className={getIconClasses(isClientOverviewActive)} />
               <span>Client Overview</span>
             </NavLink>
 
             <NavLink
-              to={`/workspace/${activeClientId}/employees`}
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              to={effectiveClientId ? `/workspace/${effectiveClientId}/employees` : '/workspace/employees'}
+              className={() => getNavItemClasses(isWorkspaceEmployeesActive)}
             >
-              <Users className="w-4 h-4" />
+              <Users className={getIconClasses(isWorkspaceEmployeesActive)} />
               <span>Employees Directory</span>
             </NavLink>
 
             <NavLink
-              to={`/workspace/${activeClientId}/attendance`}
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              to={effectiveClientId ? `/workspace/${effectiveClientId}/attendance` : '/workspace/attendance'}
+              className={() => getNavItemClasses(isWorkspaceAttendanceActive)}
             >
-              <CalendarCheck className="w-4 h-4" />
+              <CalendarCheck className={getIconClasses(isWorkspaceAttendanceActive)} />
               <span>Attendance Command</span>
             </NavLink>
 
             <NavLink
-              to={`/workspace/${activeClientId}/attendance/regularisations`}
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              to={effectiveClientId ? `/workspace/${effectiveClientId}/attendance/regularisations` : '/workspace/regularisations'}
+              className={() => getNavItemClasses(isWorkspaceRegularisationActive)}
             >
-              <Clock className="w-4 h-4" />
+              <Clock className={getIconClasses(isWorkspaceRegularisationActive)} />
               <span>Regularisation Queue</span>
             </NavLink>
 
             <NavLink
-              to={`/workspace/${activeClientId}/leave`}
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              to={effectiveClientId ? `/workspace/${effectiveClientId}/leave` : '/workspace/leave'}
+              className={() => getNavItemClasses(isWorkspaceLeaveActive)}
             >
-              <FileText className="w-4 h-4" />
+              <FileText className={getIconClasses(isWorkspaceLeaveActive)} />
               <span>Leave Management</span>
             </NavLink>
 
             <NavLink
-              to={`/workspace/${activeClientId}/payroll`}
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              to={effectiveClientId ? `/workspace/${effectiveClientId}/payroll` : '/workspace/payroll'}
+              className={() => getNavItemClasses(isWorkspacePayrollActive)}
             >
-              <DollarSign className="w-4 h-4" />
+              <DollarSign className={getIconClasses(isWorkspacePayrollActive)} />
               <span>Payroll Processing</span>
             </NavLink>
 
             <NavLink
-              to={`/workspace/${activeClientId}/payroll/payslips`}
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              to={effectiveClientId ? `/workspace/${effectiveClientId}/payroll/payslips` : '/workspace/payslips'}
+              className={() => getNavItemClasses(isWorkspacePayslipsActive)}
             >
-              <Receipt className="w-4 h-4" />
+              <Receipt className={getIconClasses(isWorkspacePayslipsActive)} />
               <span>Payslips Archive</span>
             </NavLink>
 
@@ -330,54 +333,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
             </div>
 
             <NavLink
-              to={`/workspace/${activeClientId}/organization`}
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              to={effectiveClientId ? `/workspace/${effectiveClientId}/organization` : '/workspace/organization'}
+              className={() => getNavItemClasses(isWorkspaceOrgActive)}
             >
-              <Building2 className="w-4 h-4" />
+              <Building2 className={getIconClasses(isWorkspaceOrgActive)} />
               <span>Organization Profile</span>
             </NavLink>
 
             <NavLink
-              to={`/workspace/${activeClientId}/locations`}
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              to={effectiveClientId ? `/workspace/${effectiveClientId}/locations` : '/workspace/locations'}
+              className={() => getNavItemClasses(isWorkspaceLocationsActive)}
             >
-              <MapPin className="w-4 h-4" />
+              <MapPin className={getIconClasses(isWorkspaceLocationsActive)} />
               <span>Work Locations & Geofence</span>
             </NavLink>
 
             <NavLink
-              to={`/workspace/${activeClientId}/settings`}
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              to={effectiveClientId ? `/workspace/${effectiveClientId}/settings` : '/workspace/policies'}
+              className={() => getNavItemClasses(isWorkspacePolicyActive)}
             >
-              <Sliders className="w-4 h-4" />
+              <Sliders className={getIconClasses(isWorkspacePolicyActive)} />
               <span>Client Policy Engine</span>
             </NavLink>
 
             <NavLink
-              to={`/workspace/${activeClientId}/reports`}
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              to={effectiveClientId ? `/workspace/${effectiveClientId}/reports` : '/workspace/reports'}
+              className={() => getNavItemClasses(isWorkspaceReportsActive)}
             >
-              <BarChart3 className="w-4 h-4" />
+              <BarChart3 className={getIconClasses(isWorkspaceReportsActive)} />
               <span>Client Reports</span>
             </NavLink>
           </>
@@ -389,106 +372,66 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
             </div>
 
             <NavLink
-              to="/admin"
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              to="/admin/dashboard"
+              className={() => getNavItemClasses(isMasterDashboardActive)}
             >
-              <Home className="w-4 h-4" />
+              <Home className={getIconClasses(isMasterDashboardActive)} />
               <span>Master Dashboard</span>
             </NavLink>
 
             <NavLink
               to="/admin/clients"
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              className={() => getNavItemClasses(isClientsDirectoryActive)}
             >
-              <Building2 className="w-4 h-4" />
+              <Building2 className={getIconClasses(isClientsDirectoryActive)} />
               <span>Clients Directory</span>
             </NavLink>
 
             <NavLink
               to="/admin/clients/onboard"
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              className={() => getNavItemClasses(isOnboardActive)}
             >
-              <Sparkles className="w-4 h-4 text-accent-light" />
+              <Sparkles className={getIconClasses(isOnboardActive)} />
               <span>Onboard New Client</span>
             </NavLink>
 
             <NavLink
               to="/admin/entities"
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              className={() => getNavItemClasses(isEntitiesActive)}
             >
-              <FileCheck2 className="w-4 h-4" />
+              <FileCheck2 className={getIconClasses(isEntitiesActive)} />
               <span>Legal Entities</span>
             </NavLink>
 
             <NavLink
               to="/admin/locations"
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              className={() => getNavItemClasses(isLocationsActive)}
             >
-              <MapPin className="w-4 h-4" />
+              <MapPin className={getIconClasses(isLocationsActive)} />
               <span>Work Locations & Geofence</span>
             </NavLink>
 
             <NavLink
               to="/admin/users"
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              className={() => getNavItemClasses(isUsersActive)}
             >
-              <Users className="w-4 h-4" />
+              <Users className={getIconClasses(isUsersActive)} />
               <span>Users & Roles</span>
             </NavLink>
 
             <NavLink
               to="/admin/permissions"
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              className={() => getNavItemClasses(isPermissionsActive)}
             >
-              <Sliders className="w-4 h-4" />
+              <Sliders className={getIconClasses(isPermissionsActive)} />
               <span>Permission Matrix</span>
             </NavLink>
 
             <NavLink
               to="/admin/audit"
-              end
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-accent text-white shadow-sm' : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`
-              }
+              className={() => getNavItemClasses(isAuditActive)}
             >
-              <ShieldCheck className="w-4 h-4" />
+              <ShieldCheck className={getIconClasses(isAuditActive)} />
               <span>Security Audit Logs</span>
             </NavLink>
           </>
@@ -499,7 +442,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
       <div className="p-3 border-t border-white/10 bg-white/5">
         <NavLink
           to="/portal"
-          className="flex items-center justify-between px-3 py-2 rounded-lg bg-accent/20 hover:bg-accent/30 text-accent-light text-xs font-semibold transition-colors"
+          className={({ isActive }) =>
+            `flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
+              isActive || path.startsWith('/portal')
+                ? 'bg-accent text-white shadow-sm'
+                : 'bg-accent/20 hover:bg-accent/30 text-accent-light'
+            }`
+          }
         >
           <span className="flex items-center space-x-2">
             <Clock className="w-3.5 h-3.5" />
