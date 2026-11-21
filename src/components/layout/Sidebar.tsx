@@ -20,14 +20,21 @@ import {
   FileCheck2,
   Sliders,
   Sparkles,
-  ArrowLeft
+  ArrowLeft,
+  X
 } from 'lucide-react';
 
 interface SidebarProps {
   collapsed?: boolean;
+  isOpenMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ 
+  collapsed = false,
+  isOpenMobile = false,
+  onCloseMobile
+}) => {
   const { currentUser } = useAuth();
   const { activeClient, activeClientId } = useWorkspace();
   const location = useLocation();
@@ -58,12 +65,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
     const isPortalPolicies = path.includes('/portal/polic');
 
     return (
-      <aside className={`${collapsed ? 'w-20' : 'w-64'} bg-primary-dark text-white flex flex-col shrink-0 border-r border-primary-active select-none transition-all duration-200`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] lg:static ${collapsed ? 'lg:w-20' : 'lg:w-64'} bg-primary-dark text-white flex flex-col shrink-0 border-r border-primary-active select-none transform transition-transform duration-300 ease-in-out ${
+        isOpenMobile ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
+      }`}>
         {/* Brand Header */}
         <div className={`p-4 border-b border-white/10 ${collapsed ? 'flex flex-col items-center' : ''}`}>
           {collapsed ? (
             <NavLink
               to="/portal"
+              onClick={onCloseMobile}
               className="flex items-center justify-center p-1 group focus:outline-none"
               title="Avencis Portal"
             >
@@ -75,22 +85,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
             </NavLink>
           ) : (
             <div>
-              <NavLink
-                to="/portal"
-                className="flex items-center gap-3 group focus:outline-none"
-                title="Avencis Self-Service Portal"
-              >
-                <img
-                  src={avencisSymbolDarkBg}
-                  alt="Avencis Symbol"
-                  className="h-7 w-auto max-w-[36px] object-contain shrink-0 group-hover:scale-105 transition-transform"
-                />
-                <img
-                  src={avencisWordmark}
-                  alt="Avencis"
-                  className="h-[20px] w-auto max-w-[120px] object-contain brightness-0 invert shrink-0"
-                />
-              </NavLink>
+              <div className="flex items-center justify-between">
+                <NavLink
+                  to="/portal"
+                  onClick={onCloseMobile}
+                  className="flex items-center gap-3 group focus:outline-none"
+                  title="Avencis Self-Service Portal"
+                >
+                  <img
+                    src={avencisSymbolDarkBg}
+                    alt="Avencis Symbol"
+                    className="h-7 w-auto max-w-[36px] object-contain shrink-0 group-hover:scale-105 transition-transform"
+                  />
+                  <img
+                    src={avencisWordmark}
+                    alt="Avencis"
+                    className="h-[20px] w-auto max-w-[120px] object-contain brightness-0 invert shrink-0"
+                  />
+                </NavLink>
+                {onCloseMobile && (
+                  <button
+                    onClick={onCloseMobile}
+                    className="lg:hidden p-1.5 -mr-1 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                    aria-label="Close navigation"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
               <div className="mt-2.5 px-0.5 flex items-center justify-between">
                 <span className="text-[10px] font-mono tracking-widest uppercase text-white/70 font-semibold">
                   Self-Service Portal
@@ -108,10 +130,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
           <div className="font-semibold text-sm text-white mt-0.5 truncate">{activeClient?.name || 'Client Employee'}</div>
         </div>
 
-        <nav className="p-3 space-y-1 flex-1">
+        <nav className="p-3 space-y-1 flex-1 overflow-y-auto">
           <NavLink
             to="/portal"
             end
+            onClick={onCloseMobile}
             className={() => getNavItemClasses(isPortalHome)}
           >
             <Home className={getIconClasses(isPortalHome)} />
@@ -120,6 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
           <NavLink
             to="/portal/punch"
+            onClick={onCloseMobile}
             className={() => getNavItemClasses(isPortalPunch)}
           >
             <Clock className={getIconClasses(isPortalPunch)} />
@@ -128,6 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
           <NavLink
             to="/portal/leave"
+            onClick={onCloseMobile}
             className={() => getNavItemClasses(isPortalLeave)}
           >
             <FileText className={getIconClasses(isPortalLeave)} />
@@ -136,6 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
           <NavLink
             to="/portal/regularisations"
+            onClick={onCloseMobile}
             className={() => getNavItemClasses(isPortalRegularisation)}
           >
             <ShieldCheck className={getIconClasses(isPortalRegularisation)} />
@@ -145,6 +171,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
           <NavLink
             to="/portal/payslips"
             end
+            onClick={onCloseMobile}
             className={() => getNavItemClasses(isPortalPayslips)}
           >
             <Receipt className={getIconClasses(isPortalPayslips)} />
@@ -154,6 +181,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
           <NavLink
             to="/portal/policies"
             end
+            onClick={onCloseMobile}
             className={() => getNavItemClasses(isPortalPolicies)}
           >
             <Sliders className={getIconClasses(isPortalPolicies)} />
@@ -191,12 +219,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
   const isWorkspaceReportsActive = path.includes('/workspace') && path.includes('/report');
 
   return (
-    <aside className={`${collapsed ? 'w-20' : 'w-64'} bg-primary text-white flex flex-col shrink-0 border-r border-primary-active select-none transition-all duration-200`}>
+    <aside className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] lg:static ${collapsed ? 'lg:w-20' : 'lg:w-64'} bg-primary text-white flex flex-col shrink-0 border-r border-primary-active select-none transform transition-transform duration-300 ease-in-out ${
+      isOpenMobile ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
+    }`}>
       {/* Brand Header */}
       <div className={`p-4 border-b border-white/10 ${collapsed ? 'flex flex-col items-center' : ''}`}>
         {collapsed ? (
           <NavLink
             to="/admin/dashboard"
+            onClick={onCloseMobile}
             className="flex items-center justify-center p-1 group focus:outline-none"
             title="Avencis WFM"
           >
@@ -208,22 +239,34 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
           </NavLink>
         ) : (
           <div>
-            <NavLink
-              to="/admin/dashboard"
-              className="flex items-center gap-3 group focus:outline-none"
-              title="Avencis Master Administration"
-            >
-              <img
-                src={avencisSymbolDarkBg}
-                alt="Avencis Symbol"
-                className="h-7 w-auto max-w-[36px] object-contain shrink-0 group-hover:scale-105 transition-transform"
-              />
-              <img
-                src={avencisWordmark}
-                alt="Avencis"
-                className="h-[20px] w-auto max-w-[120px] object-contain brightness-0 invert shrink-0"
-              />
-            </NavLink>
+            <div className="flex items-center justify-between">
+              <NavLink
+                to="/admin/dashboard"
+                onClick={onCloseMobile}
+                className="flex items-center gap-3 group focus:outline-none"
+                title="Avencis Master Administration"
+              >
+                <img
+                  src={avencisSymbolDarkBg}
+                  alt="Avencis Symbol"
+                  className="h-7 w-auto max-w-[36px] object-contain shrink-0 group-hover:scale-105 transition-transform"
+                />
+                <img
+                  src={avencisWordmark}
+                  alt="Avencis"
+                  className="h-[20px] w-auto max-w-[120px] object-contain brightness-0 invert shrink-0"
+                />
+              </NavLink>
+              {onCloseMobile && (
+                <button
+                  onClick={onCloseMobile}
+                  className="lg:hidden p-1.5 -mr-1 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                  aria-label="Close navigation"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
+            </div>
             <div className="mt-2.5 px-0.5 flex items-center justify-between">
               <span className="text-[10px] font-mono tracking-widest uppercase text-white/70 font-semibold">
                 {isInClientWorkspace ? 'Client Workspace' : 'Master Admin'}
@@ -249,6 +292,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
           {isSuperAdmin && (
             <NavLink
               to="/admin/dashboard"
+              onClick={onCloseMobile}
               className="mt-2 text-[11px] text-accent hover:text-accent-light font-bold flex items-center space-x-1 transition-colors"
             >
               <ArrowLeft className="w-3 h-3" />
@@ -274,6 +318,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to={effectiveClientId ? `/workspace/${effectiveClientId}` : '/workspace/overview'}
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isClientOverviewActive)}
             >
               <Home className={getIconClasses(isClientOverviewActive)} />
@@ -282,6 +327,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to={effectiveClientId ? `/workspace/${effectiveClientId}/employees` : '/workspace/employees'}
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isWorkspaceEmployeesActive)}
             >
               <Users className={getIconClasses(isWorkspaceEmployeesActive)} />
@@ -290,6 +336,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to={effectiveClientId ? `/workspace/${effectiveClientId}/attendance` : '/workspace/attendance'}
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isWorkspaceAttendanceActive)}
             >
               <CalendarCheck className={getIconClasses(isWorkspaceAttendanceActive)} />
@@ -298,6 +345,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to={effectiveClientId ? `/workspace/${effectiveClientId}/attendance/regularisations` : '/workspace/regularisations'}
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isWorkspaceRegularisationActive)}
             >
               <Clock className={getIconClasses(isWorkspaceRegularisationActive)} />
@@ -306,6 +354,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to={effectiveClientId ? `/workspace/${effectiveClientId}/leave` : '/workspace/leave'}
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isWorkspaceLeaveActive)}
             >
               <FileText className={getIconClasses(isWorkspaceLeaveActive)} />
@@ -314,6 +363,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to={effectiveClientId ? `/workspace/${effectiveClientId}/payroll` : '/workspace/payroll'}
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isWorkspacePayrollActive)}
             >
               <DollarSign className={getIconClasses(isWorkspacePayrollActive)} />
@@ -322,6 +372,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to={effectiveClientId ? `/workspace/${effectiveClientId}/payroll/payslips` : '/workspace/payslips'}
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isWorkspacePayslipsActive)}
             >
               <Receipt className={getIconClasses(isWorkspacePayslipsActive)} />
@@ -334,6 +385,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to={effectiveClientId ? `/workspace/${effectiveClientId}/organization` : '/workspace/organization'}
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isWorkspaceOrgActive)}
             >
               <Building2 className={getIconClasses(isWorkspaceOrgActive)} />
@@ -342,6 +394,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to={effectiveClientId ? `/workspace/${effectiveClientId}/locations` : '/workspace/locations'}
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isWorkspaceLocationsActive)}
             >
               <MapPin className={getIconClasses(isWorkspaceLocationsActive)} />
@@ -350,6 +403,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to={effectiveClientId ? `/workspace/${effectiveClientId}/settings` : '/workspace/policies'}
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isWorkspacePolicyActive)}
             >
               <Sliders className={getIconClasses(isWorkspacePolicyActive)} />
@@ -358,6 +412,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to={effectiveClientId ? `/workspace/${effectiveClientId}/reports` : '/workspace/reports'}
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isWorkspaceReportsActive)}
             >
               <BarChart3 className={getIconClasses(isWorkspaceReportsActive)} />
@@ -373,6 +428,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to="/admin/dashboard"
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isMasterDashboardActive)}
             >
               <Home className={getIconClasses(isMasterDashboardActive)} />
@@ -381,6 +437,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to="/admin/clients"
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isClientsDirectoryActive)}
             >
               <Building2 className={getIconClasses(isClientsDirectoryActive)} />
@@ -389,6 +446,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to="/admin/clients/onboard"
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isOnboardActive)}
             >
               <Sparkles className={getIconClasses(isOnboardActive)} />
@@ -397,6 +455,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to="/admin/entities"
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isEntitiesActive)}
             >
               <FileCheck2 className={getIconClasses(isEntitiesActive)} />
@@ -405,6 +464,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to="/admin/locations"
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isLocationsActive)}
             >
               <MapPin className={getIconClasses(isLocationsActive)} />
@@ -413,6 +473,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to="/admin/users"
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isUsersActive)}
             >
               <Users className={getIconClasses(isUsersActive)} />
@@ -421,6 +482,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to="/admin/permissions"
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isPermissionsActive)}
             >
               <Sliders className={getIconClasses(isPermissionsActive)} />
@@ -429,6 +491,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
 
             <NavLink
               to="/admin/audit"
+              onClick={onCloseMobile}
               className={() => getNavItemClasses(isAuditActive)}
             >
               <ShieldCheck className={getIconClasses(isAuditActive)} />
@@ -442,6 +505,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
       <div className="p-3 border-t border-white/10 bg-white/5">
         <NavLink
           to="/portal"
+          onClick={onCloseMobile}
           className={({ isActive }) =>
             `flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-colors ${
               isActive || path.startsWith('/portal')

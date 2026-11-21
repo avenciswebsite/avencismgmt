@@ -687,21 +687,21 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
         Must remain visible across all tab selections without unmounting.
         =======================================================================
       */}
-      <div className="bg-surface-container-low p-5 sm:p-6 rounded-xl border border-outline-variant/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
-        <div className="flex items-center gap-4">
+      <div className="bg-surface-container-low p-4 sm:p-6 rounded-xl border border-outline-variant/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+        <div className="flex items-start sm:items-center gap-3 sm:gap-4">
           {currentEmp.avatarUrl ? (
             <img
               src={currentEmp.avatarUrl}
               alt={`${currentEmp.firstName} ${currentEmp.lastName}`}
-              className="w-14 h-14 rounded-full object-cover border-2 border-secondary/20 shadow-sm shrink-0"
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-secondary/20 shadow-sm shrink-0"
             />
           ) : (
-            <div className="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg border-2 border-secondary/20 shadow-sm shrink-0">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary text-white flex items-center justify-center font-bold text-base sm:text-lg border-2 border-secondary/20 shadow-sm shrink-0">
               {currentEmp.firstName?.[0] || 'E'}{currentEmp.lastName?.[0] || ''}
             </div>
           )}
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary">
                 Employee Self-Service (ESS)
               </span>
@@ -709,7 +709,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                 ID: {currentEmp.employeeCode}
               </span>
             </div>
-            <h1 className="font-serif text-2xl sm:text-3xl text-primary font-normal mt-1 leading-tight">
+            <h1 className="font-serif text-xl sm:text-2xl md:text-3xl text-primary font-normal mt-0.5 sm:mt-1 leading-tight">
               Welcome, {currentEmp.firstName} {currentEmp.lastName}
             </h1>
             <p className="text-xs text-on-surface-variant mt-0.5 flex flex-wrap items-center gap-1.5">
@@ -723,17 +723,17 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
         </div>
 
         {/* Live Status Pill & Workplace Badge & Change Password */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 self-start md:self-center">
-          <div className="px-3 py-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/20 flex items-center gap-2 text-xs">
+        <div className="flex flex-wrap items-center gap-2 self-start md:self-center w-full md:w-auto">
+          <div className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/20 flex items-center gap-2 text-xs">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="font-mono text-on-surface-variant">GPS Telemetry: Active</span>
+            <span className="font-mono text-on-surface-variant text-[11px] sm:text-xs">GPS: Active</span>
           </div>
-          <div className="px-3 py-1.5 rounded-lg bg-primary/5 text-primary border border-primary/20 text-xs font-semibold">
+          <div className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-primary/5 text-primary border border-primary/20 text-xs font-semibold truncate max-w-[200px] sm:max-w-none">
             {assignedLocation ? assignedLocation.name : 'Primary Operations Hub'}
           </div>
           <button
             onClick={() => setIsPasswordModalOpen(true)}
-            className="px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container border border-outline-variant/30 flex items-center gap-1.5 text-xs font-semibold text-primary transition-colors shadow-sm"
+            className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container border border-outline-variant/30 flex items-center gap-1.5 text-xs font-semibold text-primary transition-colors shadow-sm ml-auto sm:ml-0"
             title="Change Account Password"
           >
             <Key className="w-3.5 h-3.5 text-primary" />
@@ -748,7 +748,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
         Must remain visible across all tab selections without unmounting.
         =======================================================================
       */}
-      <div className="flex flex-wrap sm:flex-nowrap gap-2 bg-surface-container-lowest p-2 rounded-xl border border-outline-variant/30 shadow-sm">
+      <div className="flex overflow-x-auto no-scrollbar scroll-smooth gap-1.5 sm:gap-2 bg-surface-container-lowest p-1.5 sm:p-2 rounded-xl border border-outline-variant/30 shadow-xs -mx-0.5 sm:mx-0">
         {[
           { key: 'punch', label: 'Mobile Punch Card', icon: Clock, badge: todayAttendance?.checkInTime ? 'Punched In' : 'Pending' },
           { key: 'leaves', label: 'Leave Center', icon: Calendar, badge: `${leaveBalances.reduce((acc, b) => acc + b.closing, 0)}d avail` },
@@ -765,7 +765,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                 setActiveTab(t.key as any);
                 navigate(`/portal/${t.key === 'punch' ? 'punch' : t.key}`, { replace: true });
               }}
-              className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`shrink-0 sm:flex-1 min-w-max sm:min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-2 sm:py-2.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 isActive
                   ? 'bg-primary text-white shadow-sm ring-1 ring-primary'
                   : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
@@ -820,13 +820,13 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
               {/* Left Column (Desktop 7 cols, Mobile full-width): Punch Action Center */}
               <div className="lg:col-span-7 space-y-6">
                 {/* Real-time Clock & GPS Card */}
-                <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 shadow-sm space-y-5">
+                <div className="bg-surface-container-lowest p-4 sm:p-6 rounded-xl border border-outline-variant/30 shadow-sm space-y-4 sm:space-y-5">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline-variant/20 pb-4">
                     <div>
-                      <span className="text-[11px] font-mono uppercase tracking-wider text-secondary font-bold">
+                      <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider text-secondary font-bold">
                         Live Attendance Terminal
                       </span>
-                      <div className="font-serif text-3xl sm:text-4xl text-primary font-bold tracking-tight mt-1">
+                      <div className="font-serif text-2xl sm:text-4xl text-primary font-bold tracking-tight mt-0.5 sm:mt-1">
                         {currentTime || '09:00:00 AM'}
                       </div>
                       <p className="text-xs text-on-surface-variant mt-0.5">
@@ -834,7 +834,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                       </p>
                     </div>
 
-                    <div className="sm:text-right">
+                    <div className="text-left sm:text-right mt-1 sm:mt-0">
                       <span className="text-[10px] uppercase font-bold text-on-surface-variant block">Shift Window</span>
                       <span className="font-semibold text-xs text-primary block mt-0.5">09:00 AM – 06:00 PM</span>
                       <span className="text-[10px] text-emerald-600 font-medium">15 min grace period active</span>
@@ -842,18 +842,18 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                   </div>
 
                   {/* Geofence Status Dossier */}
-                  <div className="p-4 rounded-lg bg-surface-container-low border border-outline-variant/30 space-y-2">
-                    <div className="flex items-center justify-between">
+                  <div className="p-3 sm:p-4 rounded-lg bg-surface-container-low border border-outline-variant/30 space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-1">
                       <div className="flex items-center gap-2 text-xs font-semibold text-primary">
-                        <MapPin className="w-4 h-4 text-emerald-600" />
-                        <span>{assignedLocation?.name || 'Authorized Fleet Depot'}</span>
+                        <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span className="truncate max-w-[200px] sm:max-w-none">{assignedLocation?.name || 'Authorized Fleet Depot'}</span>
                       </div>
                       {geofenceEval.isWithinGeofence ? (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 shrink-0">
                           Inside Geofence Radius
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 shrink-0">
                           Outside Geofence ({geofenceEval.distanceMeters >= 1000 ? `${(geofenceEval.distanceMeters / 1000).toFixed(1)} km` : `${geofenceEval.distanceMeters}m`} away)
                         </span>
                       )}
@@ -861,7 +861,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                     <p className="text-[11px] text-on-surface-variant">
                       {assignedLocation?.address || (assignedLocation as any)?.address_line1 || 'Authorized Workplace Depot'}
                     </p>
-                    <div className="flex flex-wrap items-center gap-4 text-[11px] font-mono text-on-surface-variant pt-1 border-t border-outline-variant/20">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] sm:text-[11px] font-mono text-on-surface-variant pt-1 border-t border-outline-variant/20">
                       <span>Device GPS: {portalCoords.lat.toFixed(4)}° N, {portalCoords.lng.toFixed(4)}° E</span>
                       <span>Accuracy: ±{portalAccuracy}m</span>
                       <span>Site Radius: {(assignedLocation as any)?.radiusMeters || (assignedLocation as any)?.radius_meters || 1000}m</span>
@@ -870,8 +870,8 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
 
                   {/* WFH Request Banner when Outside Geofence */}
                   {isGeofenceBlocked && !isAlreadyCheckedIn && !isShiftCompleted && (
-                    <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-xs space-y-3">
-                      <div className="flex items-center justify-between">
+                    <div className="p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-xs space-y-2.5 sm:space-y-3">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
                         <div className="flex items-center gap-2">
                           <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
                             <Home className="w-4 h-4" />
@@ -893,7 +893,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                       <button
                         type="button"
                         onClick={() => setShowWfhModal(true)}
-                        className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-2 rounded-lg transition-all shadow-sm"
+                        className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-2 rounded-lg transition-all shadow-sm"
                       >
                         <Home className="w-3.5 h-3.5" />
                         <span>Request Work From Home (WFH) for Today</span>
@@ -902,18 +902,18 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                   )}
 
                   {/* Large Touch/Click Punch Buttons */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-2">
                     <button
                       onClick={() => handlePunch('CHECK_IN')}
                       disabled={isPunching || !canCheckIn}
-                      className={`py-4 px-6 rounded-xl font-semibold text-sm flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all shadow-md ${
+                      className={`py-3.5 sm:py-4 px-3 sm:px-6 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 sm:gap-2.5 active:scale-[0.98] transition-all shadow-md text-center ${
                         canCheckIn
                           ? 'bg-primary text-white hover:bg-primary-dark'
                           : 'bg-surface-container-high text-on-surface-variant cursor-not-allowed opacity-60'
                       }`}
                     >
-                      <Navigation className="w-5 h-5 text-accent-light" />
-                      <span>
+                      <Navigation className="w-4 h-4 sm:w-5 sm:h-5 text-accent-light shrink-0" />
+                      <span className="leading-tight">
                         {isPunching 
                           ? 'Verifying GPS...' 
                           : isShiftCompleted 
@@ -929,14 +929,14 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                     <button
                       onClick={() => handlePunch('CHECK_OUT')}
                       disabled={isPunching || !canCheckOut}
-                      className={`py-4 px-6 rounded-xl border-2 font-semibold text-sm flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all shadow-sm ${
+                      className={`py-3.5 sm:py-4 px-3 sm:px-6 rounded-xl border-2 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 sm:gap-2.5 active:scale-[0.98] transition-all shadow-sm text-center ${
                         canCheckOut
                           ? 'bg-surface-container-lowest text-primary border-primary/20 hover:border-primary'
                           : 'bg-surface-container-low text-on-surface-variant border-outline-variant/20 cursor-not-allowed opacity-60'
                       }`}
                     >
-                      <Clock className="w-5 h-5 text-secondary" />
-                      <span>
+                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-secondary shrink-0" />
+                      <span className="leading-tight">
                         {isPunching 
                           ? 'Verifying GPS...' 
                           : isShiftCompleted 

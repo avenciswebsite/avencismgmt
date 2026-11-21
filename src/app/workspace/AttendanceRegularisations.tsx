@@ -320,10 +320,10 @@ export const AttendanceRegularisations: React.FC = () => {
                   </div>
 
                   {status === 'PENDING' && (
-                    <div className="flex items-center space-x-2 shrink-0">
+                    <div className="flex items-center space-x-2 shrink-0 self-end sm:self-center w-full sm:w-auto justify-end">
                       <button
                         onClick={() => setDecisionModal({ id: c.id, action: 'REJECTED', empId })}
-                        className="px-3 py-1.5 rounded-lg border border-error/30 text-error hover:bg-error/10 text-xs font-bold transition-colors"
+                        className="px-3.5 py-1.5 rounded-lg border border-error/30 text-error hover:bg-error/10 text-xs font-bold transition-colors"
                       >
                         Reject
                       </button>
@@ -333,7 +333,7 @@ export const AttendanceRegularisations: React.FC = () => {
                           title="Anti-Self-Approval Rule: Managers cannot approve their own regularisation requests."
                           className="px-3 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/30 text-on-surface-variant text-[11px] font-bold flex items-center gap-1 cursor-not-allowed opacity-75"
                         >
-                          <ShieldAlert className="w-3 h-3 text-secondary" />
+                          <ShieldAlert className="w-3 h-3 text-secondary shrink-0" />
                           <span>Self-Approval Prohibited</span>
                         </div>
                       ) : (
@@ -341,7 +341,7 @@ export const AttendanceRegularisations: React.FC = () => {
                           onClick={() => setDecisionModal({ id: c.id, action: 'APPROVED', empId })}
                           className="px-4 py-1.5 rounded-lg bg-success hover:bg-success/90 text-white text-xs font-bold transition-colors shadow-sm flex items-center space-x-1"
                         >
-                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                           <span>Approve</span>
                         </button>
                       )}
@@ -356,8 +356,8 @@ export const AttendanceRegularisations: React.FC = () => {
 
       {/* Decision Remarks Modal */}
       {decisionModal && (
-        <div className="fixed inset-0 bg-primary-dark/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-elevated border border-surface-container-high p-6 max-w-md w-full space-y-4 text-xs">
+        <div className="fixed inset-0 bg-primary-dark/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-elevated border border-surface-container-high p-4 sm:p-6 max-w-md w-full max-h-[85vh] overflow-y-auto space-y-4 text-xs">
             <h3 className="text-base font-serif font-bold text-primary">
               {decisionModal.action === 'APPROVED' ? 'Approve Regularisation' : 'Reject Regularisation'}
             </h3>

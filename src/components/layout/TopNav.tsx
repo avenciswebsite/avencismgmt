@@ -13,10 +13,15 @@ import {
   Lock,
   Sparkles,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Menu
 } from 'lucide-react';
 
-export const TopNav: React.FC = () => {
+interface TopNavProps {
+  onToggleMobileMenu?: () => void;
+}
+
+export const TopNav: React.FC<TopNavProps> = ({ onToggleMobileMenu }) => {
   const { currentUser, logout } = useAuth();
   const { activeClient, activeClientId, switchClient, availableClients } = useWorkspace();
   const navigate = useNavigate();
@@ -39,28 +44,41 @@ export const TopNav: React.FC = () => {
   };
 
   return (
-    <header className="h-16 bg-surface-container-lowest border-b border-surface-container-high px-6 flex items-center justify-between shrink-0 shadow-sm z-20">
+    <header className="h-16 bg-surface-container-lowest border-b border-surface-container-high px-3 sm:px-6 flex items-center justify-between shrink-0 shadow-sm z-20">
       {/* Left: Active Scope or Global Search */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-2 sm:space-x-4">
+        {/* Mobile Navigation Toggle Button */}
+        {onToggleMobileMenu && (
+          <button
+            type="button"
+            onClick={onToggleMobileMenu}
+            className="p-2 -ml-1 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-low lg:hidden transition-colors"
+            title="Open Navigation Menu"
+            aria-label="Open Navigation Menu"
+          >
+            <Menu className="w-5 h-5 text-primary" />
+          </button>
+        )}
+
         {/* Client Workspace Switcher (Super Admin) or Static Scope (Client Admin) */}
         {isSuperAdmin ? (
           <div className="relative">
             <button
               onClick={() => setShowClientDropdown(!showClientDropdown)}
-              className="flex items-center space-x-2.5 px-3 py-1.5 rounded-lg border border-surface-container-high hover:border-primary/30 bg-surface-container-low transition-colors text-left"
+              className="flex items-center space-x-2 sm:space-x-2.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-surface-container-high hover:border-primary/30 bg-surface-container-low transition-colors text-left"
             >
-              <div className="w-6 h-6 rounded bg-primary text-white flex items-center justify-center font-bold text-xs">
+              <div className="w-6 h-6 rounded bg-primary text-white flex items-center justify-center font-bold text-xs shrink-0">
                 {activeClient?.code?.substring(0, 2) || 'CL'}
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] text-on-surface-variant uppercase font-bold tracking-wider leading-none">
                   Active Client
                 </span>
-                <span className="text-xs font-bold text-primary truncate max-w-[160px] leading-tight mt-0.5">
+                <span className="text-xs font-bold text-primary truncate max-w-[110px] sm:max-w-[160px] md:max-w-[220px] leading-tight mt-0.5">
                   {activeClient?.name}
                 </span>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-on-surface-variant" />
+              <ChevronDown className="w-3.5 h-3.5 text-on-surface-variant shrink-0" />
             </button>
 
             {showClientDropdown && (
@@ -112,9 +130,9 @@ export const TopNav: React.FC = () => {
             )}
           </div>
         ) : (
-          <div className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-surface-container-low border border-surface-container-high">
-            <Building2 className="w-4 h-4 text-primary" />
-            <span className="text-xs font-bold text-primary">{activeClient?.name}</span>
+          <div className="flex items-center space-x-1.5 sm:space-x-2 px-2 sm:px-3 py-1.5 rounded-lg bg-surface-container-low border border-surface-container-high max-w-[130px] xs:max-w-[180px] sm:max-w-none">
+            <Building2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary shrink-0" />
+            <span className="text-xs font-bold text-primary truncate">{activeClient?.name}</span>
           </div>
         )}
 

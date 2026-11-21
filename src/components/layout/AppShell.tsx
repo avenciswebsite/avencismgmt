@@ -1,5 +1,5 @@
-import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { TopNav } from './TopNav';
 import { useAuth } from '../../context/AuthContext';
@@ -8,6 +8,13 @@ import { ShieldAlert, LogOut } from 'lucide-react';
 
 export const AppShell: React.FC = () => {
   const { currentUser, isLoading, isProfileMissing, authError, logout } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+
+  // Automatically close mobile navigation drawer when user navigates to a new page
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   // 1. Session Loading State: Prevent flashing incorrect or unauthorized dashboards
   if (isLoading) {
@@ -54,12 +61,26 @@ export const AppShell: React.FC = () => {
 
   // 4. Authenticated Shell
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-surface">
-      <Sidebar />
+    <div className="flex h-screen w-screen overflow-hidden bg-surface relative">
+      {/* Mobile Backdrop Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-primary-dark/60 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300"
+          onClick={() => setIsMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Responsive Navigation Sidebar */}
+      <Sidebar 
+        isOpenMobile={isMobileMenuOpen} 
+        onCloseMobile={() => setIsMobileMenuOpen(false)} 
+      />
+
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <TopNav />
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
+        <TopNav onToggleMobileMenu={() => setIsMobileMenuOpen(prev => !prev)} />
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-5 md:p-8">
+          <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
             <Outlet />
           </div>
         </main>

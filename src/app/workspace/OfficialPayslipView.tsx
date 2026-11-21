@@ -138,7 +138,7 @@ export const OfficialPayslipView: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-12">
       {/* Action Bar (Hidden in Print) */}
-      <div className="flex items-center justify-between bg-surface-container-low p-4 rounded-lg border border-outline-variant/30 print:hidden">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-surface-container-low p-3.5 sm:p-4 rounded-lg border border-outline-variant/30 print:hidden">
         <button
           onClick={() => navigate('/workspace/payslips')}
           className="flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors"
@@ -147,7 +147,7 @@ export const OfficialPayslipView: React.FC = () => {
           <span>Back to Payslips Register</span>
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => window.print()}
             className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white rounded text-xs font-medium hover:bg-primary/90 shadow transition-colors"
@@ -166,7 +166,7 @@ export const OfficialPayslipView: React.FC = () => {
       </div>
 
       {/* Official Printable A4 Document Sheet */}
-      <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-8 sm:p-12 shadow-md text-on-surface print:border-none print:shadow-none print:p-0">
+      <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-4 sm:p-8 md:p-12 shadow-md text-on-surface print:border-none print:shadow-none print:p-0">
         {/* Header with Employer Entity */}
         <div className="border-b-2 border-primary pb-6 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">

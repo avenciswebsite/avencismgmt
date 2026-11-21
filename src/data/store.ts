@@ -544,10 +544,13 @@ class AppStore {
           daily.locationName = locationName;
           daily.status = 'PRESENT';
         } else {
+          const emp = this.employees.find(e => e.id === corr.employeeId);
           this.attendanceRecords.push({
             id: `att-${Date.now().toString(36)}`,
             clientId: corr.clientId,
             employeeId: corr.employeeId,
+            employeeName: emp ? `${emp.firstName} ${emp.lastName}` : (corr.employeeName || 'Employee'),
+            employeeCode: emp ? emp.employeeCode : 'EMP',
             date: corr.date,
             checkInTime: corr.requestedCheckIn,
             checkOutTime: corr.requestedCheckOut,
@@ -555,8 +558,6 @@ class AppStore {
             status: 'PRESENT',
             locationName,
             isRegularised: true,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
           });
         }
       }

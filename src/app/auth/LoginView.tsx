@@ -65,7 +65,7 @@ export const LoginView: React.FC = () => {
         </header>
 
         {/* Main Login Card */}
-        <div className="w-full bg-surface-container-lowest rounded-2xl shadow-xl border border-outline-variant/30 p-8">
+        <div className="w-full bg-surface-container-lowest rounded-2xl shadow-xl border border-outline-variant/30 p-5 sm:p-8">
           <div className="mb-6">
             <h1 className="font-serif text-2xl text-primary font-normal">Sign In</h1>
             <p className="text-xs text-on-surface-variant mt-1">

@@ -172,7 +172,7 @@ export const AttendanceCommandCenter: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => loadData()}
             disabled={isLoading}

@@ -21,7 +21,7 @@ import {
 
 export const MobilePunchCard: React.FC = () => {
   const { user } = useAuth();
-  const { currentClient, activeLocations } = useWorkspace();
+  const { currentClient, activeLocations, clientPolicy } = useWorkspace();
 
   // Coordinates & GPS Telemetry
   const defaultCoords = { lat: 18.5204, lng: 73.8567 };

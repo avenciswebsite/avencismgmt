@@ -236,7 +236,7 @@ export const LeaveManagement: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center space-x-2 text-xs">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className="px-3 py-1.5 rounded-lg bg-surface-container-low border border-surface-container-high font-semibold text-primary">
             Monthly Credit: <strong>{monthlyCredit} Days</strong>
           </span>
