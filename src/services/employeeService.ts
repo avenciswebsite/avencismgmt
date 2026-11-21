@@ -658,6 +658,16 @@ export const employeeService = {
         if (updates.mobile) emp.mobile = updates.mobile;
         if (updates.designation) emp.designation = updates.designation;
         if (updates.status) emp.status = (updates.status === 'SUSPENDED' ? 'ON_NOTICE' : updates.status) as any;
+        if (updates.department_id !== undefined) (emp as any).departmentId = updates.department_id;
+        if (updates.work_location_id) (emp as any).locationId = updates.work_location_id;
+        if (updates.legal_entity_id) (emp as any).legalEntityId = updates.legal_entity_id;
+        if (updates.pan_number) (emp as any).pan = updates.pan_number;
+        if (updates.aadhaar_number) (emp as any).aadhaar = updates.aadhaar_number;
+        if (updates.uan_number !== undefined) (emp as any).uan = updates.uan_number;
+        if (updates.esic_number !== undefined) (emp as any).esic = updates.esic_number;
+        if (updates.joining_date) emp.joiningDate = updates.joining_date;
+        if (updates.employment_arrangement) (emp as any).arrangement = updates.employment_arrangement;
+        store.saveToStorage();
       }
       return this.getEmployeeById(id, callerScope);
     }
@@ -665,7 +675,10 @@ export const employeeService = {
     try {
       const { data, error } = await supabase
         .from('employees')
-        .update(updates)
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString(),
+        })
         .eq('id', id)
         .select()
         .single();
@@ -677,6 +690,146 @@ export const employeeService = {
       return successResponse(data);
     } catch (err) {
       return errorResponse(handleSupabaseError(err, 'employeeService.updateEmployee'));
+    }
+  },
+
+  /**
+   * Updates or inserts the salary structure for an employee.
+   */
+  async upsertSalaryStructure(
+    employeeId: string,
+    clientId: string,
+    salaryData: { fixed_monthly_base: number; variable_incentives?: number; special_allowances?: number },
+    callerScope?: CallerScope
+  ): Promise<ServiceResponse<SalaryStructureRow>> {
+    if (!employeeId) return errorResponse(createValidationError('Employee ID is required.', 'employee_id'));
+    if (!clientId) return errorResponse(createValidationError('Client ID is required.', 'client_id'));
+    if (typeof salaryData.fixed_monthly_base !== 'number' || salaryData.fixed_monthly_base < 0) {
+      return errorResponse(createValidationError('Fixed monthly base salary must be a positive number.', 'fixed_monthly_base'));
+    }
+
+    if (callerScope?.role && !SENSITIVE_FINANCIAL_ROLES.includes(callerScope.role)) {
+      return errorResponse(
+        createPermissionError('Access Denied: Only Super Admin, Client Admin, or Payroll Admin can configure compensation structures.')
+      );
+    }
+
+    if (isMockMode()) {
+      const emp = store.getEmployee(employeeId);
+      if (emp) {
+        emp.fixedMonthlySalary = salaryData.fixed_monthly_base;
+        if (salaryData.variable_incentives !== undefined) emp.variableIncentive = salaryData.variable_incentives;
+        if (salaryData.special_allowances !== undefined) emp.otherAllowances = salaryData.special_allowances;
+        store.saveToStorage();
+      }
+      return this.getSalaryStructure(employeeId, callerScope);
+    }
+
+    try {
+      // Check if existing active structure exists
+      const { data: existing } = await supabase
+        .from('employee_salary_structures')
+        .select('id')
+        .eq('employee_id', employeeId)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (existing) {
+        const { data: updated, error } = await supabase
+          .from('employee_salary_structures')
+          .update({
+            fixed_monthly_base: salaryData.fixed_monthly_base,
+            variable_incentives: salaryData.variable_incentives ?? 0,
+            special_allowances: salaryData.special_allowances ?? 0,
+          })
+          .eq('id', existing.id)
+          .select()
+          .single();
+
+        if (error) return errorResponse(handleSupabaseError(error, 'employeeService.upsertSalaryStructure'));
+        return successResponse(updated);
+      } else {
+        const { data: inserted, error } = await supabase
+          .from('employee_salary_structures')
+          .insert({
+            employee_id: employeeId,
+            client_id: clientId,
+            fixed_monthly_base: salaryData.fixed_monthly_base,
+            hra: 0,
+            conveyance: 0,
+            special_allowances: salaryData.special_allowances ?? 0,
+            variable_incentives: salaryData.variable_incentives ?? 0,
+            effective_from: new Date().toISOString().split('T')[0],
+            is_active: true,
+          })
+          .select()
+          .single();
+
+        if (error) return errorResponse(handleSupabaseError(error, 'employeeService.upsertSalaryStructure'));
+        return successResponse(inserted);
+      }
+    } catch (err) {
+      return errorResponse(handleSupabaseError(err, 'employeeService.upsertSalaryStructure'));
+    }
+  },
+
+  /**
+   * Updates or inserts bank disbursement coordinates for an employee.
+   */
+  async upsertBankDetails(
+    employeeId: string,
+    clientId: string,
+    bankData: { 
+      bank_name: string; 
+      account_number: string; 
+      ifsc_code: string; 
+      account_type?: 'SAVINGS' | 'CURRENT' | 'SALARY'; 
+      is_verified?: boolean 
+    },
+    callerScope?: CallerScope
+  ): Promise<ServiceResponse<BankDetailsRow>> {
+    if (!employeeId) return errorResponse(createValidationError('Employee ID is required.', 'employee_id'));
+    if (!clientId) return errorResponse(createValidationError('Client ID is required.', 'client_id'));
+    if (!bankData.bank_name?.trim()) return errorResponse(createValidationError('Bank name is required.', 'bank_name'));
+    if (!bankData.account_number?.trim()) return errorResponse(createValidationError('Bank account number is required.', 'account_number'));
+    if (!bankData.ifsc_code?.trim()) return errorResponse(createValidationError('IFSC code is required.', 'ifsc_code'));
+
+    if (callerScope?.role && !SENSITIVE_FINANCIAL_ROLES.includes(callerScope.role)) {
+      return errorResponse(
+        createPermissionError('Access Denied: Only Super Admin, Client Admin, or Payroll Admin can configure bank coordinates.')
+      );
+    }
+
+    if (isMockMode()) {
+      const emp = store.getEmployee(employeeId);
+      if (emp) {
+        emp.bankName = bankData.bank_name;
+        emp.accountNumber = bankData.account_number;
+        emp.ifscCode = bankData.ifsc_code;
+        store.saveToStorage();
+      }
+      return this.getBankDetails(employeeId, callerScope);
+    }
+
+    try {
+      const { data: upserted, error } = await supabase
+        .from('employee_bank_details')
+        .upsert({
+          employee_id: employeeId,
+          client_id: clientId,
+          bank_name: bankData.bank_name.trim(),
+          account_number: bankData.account_number.trim(),
+          ifsc_code: bankData.ifsc_code.trim().toUpperCase(),
+          account_type: (bankData.account_type as 'SAVINGS' | 'CURRENT' | 'SALARY') || 'SAVINGS',
+          is_verified: bankData.is_verified ?? true,
+        }, { onConflict: 'employee_id' })
+        .select()
+        .single();
+
+      if (error) return errorResponse(handleSupabaseError(error, 'employeeService.upsertBankDetails'));
+      return successResponse(upserted);
+    } catch (err) {
+      return errorResponse(handleSupabaseError(err, 'employeeService.upsertBankDetails'));
     }
   },
 };

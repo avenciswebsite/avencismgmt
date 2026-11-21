@@ -25,7 +25,8 @@ import {
   CreditCard,
   AlertCircle,
   RefreshCw,
-  ShieldAlert
+  ShieldAlert,
+  Edit3
 } from 'lucide-react';
 
 export const EmployeeDirectory: React.FC = () => {
@@ -53,6 +54,7 @@ export const EmployeeDirectory: React.FC = () => {
   // Security Gate: Check if caller is authorized to view sensitive compensation CTC
   const canViewCompensation = currentUser && ['super_admin', 'client_admin', 'payroll_admin'].includes(currentUser.role);
   const canOnboard = currentUser && ['super_admin', 'client_admin', 'hr_admin'].includes(currentUser.role);
+  const canEdit = currentUser && ['super_admin', 'client_admin', 'hr_admin', 'payroll_admin'].includes(currentUser.role);
 
   const userRole = currentUser?.role;
   const userClientId = currentUser?.clientId || effectiveClientId;
@@ -421,9 +423,28 @@ export const EmployeeDirectory: React.FC = () => {
                       </td>
 
                       <td className="py-3 px-4 text-right">
-                        <span className="p-1 rounded-lg text-primary hover:bg-surface-container-high transition-colors inline-block">
-                          <ChevronRight className="w-4 h-4" />
-                        </span>
+                        <div className="flex items-center justify-end space-x-1.5">
+                          {canEdit && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const targetUrl = routeClientId 
+                                  ? `/workspace/${routeClientId}/employees/${emp.id}?edit=true`
+                                  : `/workspace/${effectiveClientId}/employees/${emp.id}?edit=true`;
+                                navigate(targetUrl);
+                              }}
+                              title="Edit Employee Details"
+                              className="px-2.5 py-1 rounded-lg bg-surface-container-high hover:bg-primary/10 text-primary border border-primary/20 hover:border-primary/40 transition-colors flex items-center space-x-1 text-xs font-semibold cursor-pointer"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span className="hidden sm:inline">Edit</span>
+                            </button>
+                          )}
+                          <span className="p-1 rounded-lg text-primary hover:bg-surface-container-high transition-colors inline-block">
+                            <ChevronRight className="w-4 h-4" />
+                          </span>
+                        </div>
                       </td>
                     </tr>
                   );

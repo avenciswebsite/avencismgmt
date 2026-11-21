@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { useAuth } from '../../context/AuthContext';
 import { employeeService } from '../../services/employeeService';
@@ -31,7 +31,14 @@ import {
   AlertCircle,
   ShieldAlert,
   Lock,
-  RefreshCw
+  RefreshCw,
+  Edit3,
+  Save,
+  X,
+  Layers,
+  DollarSign,
+  AlertTriangle,
+  Loader2
 } from 'lucide-react';
 
 export const EmployeeProfileView: React.FC = () => {
@@ -70,6 +77,205 @@ export const EmployeeProfileView: React.FC = () => {
     clientId: userClientId,
     employeeId: userEmpId,
   }), [userRole, userClientId, userEmpId]);
+
+  const canEdit = currentUser?.role === 'super_admin' || 
+    currentUser?.role === 'client_admin' || 
+    currentUser?.role === 'hr_admin' || 
+    currentUser?.role === 'payroll_admin';
+
+  const canEditFinance = currentUser?.role === 'super_admin' || 
+    currentUser?.role === 'client_admin' || 
+    currentUser?.role === 'payroll_admin';
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [activeEditTab, setActiveEditTab] = useState<'personal' | 'org' | 'compensation' | 'banking'>('personal');
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editSuccessMsg, setEditSuccessMsg] = useState<string | null>(null);
+
+  // Form states for full employee editing
+  const [editFirstName, setEditFirstName] = useState('');
+  const [editLastName, setEditLastName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editMobile, setEditMobile] = useState('');
+  const [editDesignation, setEditDesignation] = useState('');
+  const [editJoiningDate, setEditJoiningDate] = useState('');
+  const [editStatus, setEditStatus] = useState<'ACTIVE' | 'ON_NOTICE' | 'SUSPENDED' | 'TERMINATED'>('ACTIVE');
+  const [editArrangement, setEditArrangement] = useState<'DIRECT_PERMANENT' | 'DIRECT_CONTRACT' | 'DEPUTED_STAFFING' | 'INTERN'>('DIRECT_PERMANENT');
+  const [editLegalEntityId, setEditLegalEntityId] = useState('');
+  const [editWorkLocationId, setEditWorkLocationId] = useState('');
+  const [editDepartmentId, setEditDepartmentId] = useState('');
+  const [editEmployeeCode, setEditEmployeeCode] = useState('');
+  const [editFixedMonthlyBase, setEditFixedMonthlyBase] = useState('0');
+  const [editVariableIncentives, setEditVariableIncentives] = useState('0');
+  const [editSpecialAllowances, setEditSpecialAllowances] = useState('0');
+  const [editBankName, setEditBankName] = useState('');
+  const [editAccountNumber, setEditAccountNumber] = useState('');
+  const [editIfscCode, setEditIfscCode] = useState('');
+  const [editAccountType, setEditAccountType] = useState<'SAVINGS' | 'CURRENT' | 'SALARY'>('SAVINGS');
+  const [editPanNumber, setEditPanNumber] = useState('');
+  const [editAadhaarNumber, setEditAadhaarNumber] = useState('');
+  const [editUanNumber, setEditUanNumber] = useState('');
+  const [editEsicNumber, setEditEsicNumber] = useState('');
+
+  const openEditModal = useCallback((tab: 'personal' | 'org' | 'compensation' | 'banking' = 'personal') => {
+    if (!employee) return;
+    setEditFirstName(employee.first_name || '');
+    setEditLastName(employee.last_name || '');
+    setEditEmail(employee.email || '');
+    setEditMobile(employee.mobile || '');
+    setEditDesignation(employee.designation || '');
+    setEditJoiningDate(employee.joining_date || '2026-11-01');
+    setEditStatus(employee.status || 'ACTIVE');
+    setEditArrangement(employee.employment_arrangement || 'DIRECT_PERMANENT');
+    setEditLegalEntityId(employee.legal_entity_id || '');
+    setEditWorkLocationId(employee.work_location_id || '');
+    setEditDepartmentId(employee.department_id || '');
+    setEditEmployeeCode(employee.employee_code || '');
+    setEditPanNumber(employee.pan_number || '');
+    setEditAadhaarNumber(employee.aadhaar_number || '');
+    setEditUanNumber(employee.uan_number || '');
+    setEditEsicNumber(employee.esic_number || '');
+
+    if (salaryStructure) {
+      setEditFixedMonthlyBase(String(salaryStructure.fixed_monthly_base || 0));
+      setEditVariableIncentives(String(salaryStructure.variable_incentives || 0));
+      setEditSpecialAllowances(String(salaryStructure.special_allowances || 0));
+    } else {
+      setEditFixedMonthlyBase('25000');
+      setEditVariableIncentives('0');
+      setEditSpecialAllowances('0');
+    }
+
+    if (bankDetails) {
+      setEditBankName(bankDetails.bank_name || '');
+      setEditAccountNumber(bankDetails.account_number || '');
+      setEditIfscCode(bankDetails.ifsc_code || '');
+      setEditAccountType(bankDetails.account_type || 'SAVINGS');
+    } else {
+      setEditBankName('');
+      setEditAccountNumber('');
+      setEditIfscCode('');
+      setEditAccountType('SAVINGS');
+    }
+
+    setEditError(null);
+    setActiveEditTab(tab);
+    setIsEditModalOpen(true);
+  }, [employee, salaryStructure, bankDetails]);
+
+  // Handle URL query parameter ?edit=true
+  useEffect(() => {
+    if (searchParams.get('edit') === 'true' && employee && !isEditModalOpen) {
+      openEditModal('personal');
+      searchParams.delete('edit');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, employee, isEditModalOpen, openEditModal, setSearchParams]);
+
+  const handleSaveEmployeeDetails = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!employee) return;
+
+    if (!editFirstName.trim() || !editLastName.trim()) {
+      setEditError('First name and last name are required.');
+      return;
+    }
+    if (!editEmail.trim()) {
+      setEditError('Work email is required.');
+      return;
+    }
+    if (!editMobile.trim()) {
+      setEditError('Mobile number is required.');
+      return;
+    }
+    if (!editLegalEntityId) {
+      setEditError('Legal employer / entity is required.');
+      return;
+    }
+    if (!editWorkLocationId) {
+      setEditError('Assigned work location is required.');
+      return;
+    }
+
+    setIsSavingEdit(true);
+    setEditError(null);
+
+    try {
+      // 1. Update Core Employee Fields
+      const updateRes = await employeeService.updateEmployee(
+        employee.id,
+        {
+          first_name: editFirstName.trim(),
+          last_name: editLastName.trim(),
+          email: editEmail.trim(),
+          mobile: editMobile.trim(),
+          designation: editDesignation.trim() || 'Staff',
+          joining_date: editJoiningDate,
+          status: editStatus,
+          employment_arrangement: editArrangement,
+          employee_code: editEmployeeCode.trim() || employee.employee_code,
+          legal_entity_id: editLegalEntityId,
+          work_location_id: editWorkLocationId,
+          department_id: editDepartmentId ? editDepartmentId : null,
+          pan_number: editPanNumber.trim().toUpperCase(),
+          aadhaar_number: editAadhaarNumber.trim(),
+          uan_number: editUanNumber.trim() || null,
+          esic_number: editEsicNumber.trim() || null,
+        },
+        callerScope
+      );
+
+      if (!updateRes.success) {
+        setEditError(updateRes.error?.message || 'Failed to update employee details.');
+        setIsSavingEdit(false);
+        return;
+      }
+
+      // 2. Update Salary Structure if permitted
+      if (canEditFinance) {
+        const base = parseFloat(editFixedMonthlyBase) || 0;
+        const incentive = parseFloat(editVariableIncentives) || 0;
+        const allowances = parseFloat(editSpecialAllowances) || 0;
+        await employeeService.upsertSalaryStructure(
+          employee.id,
+          employee.client_id,
+          {
+            fixed_monthly_base: base,
+            variable_incentives: incentive,
+            special_allowances: allowances,
+          },
+          callerScope
+        );
+      }
+
+      // 3. Update Bank Details if provided and permitted
+      if (canEditFinance && editBankName.trim() && editAccountNumber.trim() && editIfscCode.trim()) {
+        await employeeService.upsertBankDetails(
+          employee.id,
+          employee.client_id,
+          {
+            bank_name: editBankName.trim(),
+            account_number: editAccountNumber.trim(),
+            ifsc_code: editIfscCode.trim().toUpperCase(),
+            account_type: editAccountType,
+            is_verified: true,
+          },
+          callerScope
+        );
+      }
+
+      setEditSuccessMsg(`Employee record for ${editFirstName} ${editLastName} updated successfully!`);
+      setIsEditModalOpen(false);
+      await loadProfile();
+      setTimeout(() => setEditSuccessMsg(null), 5000);
+    } catch (err: any) {
+      setEditError(err.message || 'An unexpected error occurred while saving employee details.');
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
 
   const loadProfile = useCallback(async () => {
     if (!employeeId) {
@@ -203,6 +409,15 @@ export const EmployeeProfileView: React.FC = () => {
         </button>
 
         <div className="flex items-center gap-2">
+          {canEdit && (
+            <button
+              onClick={() => openEditModal('personal')}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-primary text-white rounded text-xs font-bold hover:bg-primary-dark transition-colors shadow-sm"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Edit Employee</span>
+            </button>
+          )}
           <button
             onClick={() => loadProfile()}
             className="p-1.5 rounded-lg border border-outline-variant/30 hover:bg-surface-container-low text-on-surface-variant transition-colors"
@@ -219,6 +434,18 @@ export const EmployeeProfileView: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {editSuccessMsg && (
+        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs font-semibold text-emerald-800 dark:text-emerald-300 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>{editSuccessMsg}</span>
+          </div>
+          <button onClick={() => setEditSuccessMsg(null)} className="text-emerald-700 hover:text-emerald-900">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
       {/* Hero Profile Card */}
       <div className="bg-surface-container-lowest p-6 rounded-lg border border-outline-variant/30 shadow-sm">
@@ -297,7 +524,18 @@ export const EmployeeProfileView: React.FC = () => {
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
             <div className="space-y-4">
-              <h3 className="font-serif text-base text-primary font-normal">Organizational Placement</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-serif text-base text-primary font-normal">Organizational Placement</h3>
+                {canEdit && (
+                  <button
+                    onClick={() => openEditModal('org')}
+                    className="text-[11px] font-bold text-accent hover:text-accent-hover flex items-center space-x-1"
+                  >
+                    <Edit3 className="w-3 h-3" />
+                    <span>Edit Placement</span>
+                  </button>
+                )}
+              </div>
               <div className="grid grid-cols-2 gap-3 p-4 bg-surface-container-low rounded border border-outline-variant/20">
                 <div>
                   <span className="text-[10px] uppercase text-on-surface-variant block font-medium">Employment Arrangement</span>
@@ -325,7 +563,18 @@ export const EmployeeProfileView: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-serif text-base text-primary font-normal">Work Schedule & Geofencing</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-serif text-base text-primary font-normal">Work Schedule & Geofencing</h3>
+                {canEdit && (
+                  <button
+                    onClick={() => openEditModal('org')}
+                    className="text-[11px] font-bold text-accent hover:text-accent-hover flex items-center space-x-1"
+                  >
+                    <Edit3 className="w-3 h-3" />
+                    <span>Edit Location</span>
+                  </button>
+                )}
+              </div>
               <div className="p-4 bg-surface-container-low rounded border border-outline-variant/20 space-y-2">
                 <div className="flex justify-between">
                   <span className="text-on-surface-variant">Default Shift:</span>
@@ -366,7 +615,18 @@ export const EmployeeProfileView: React.FC = () => {
             ) : (
               <>
                 <div>
-                  <h3 className="font-serif text-base text-primary font-normal mb-3">Salary & Remuneration Structure</h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-serif text-base text-primary font-normal">Salary & Remuneration Structure</h3>
+                    {canEditFinance && (
+                      <button
+                        onClick={() => openEditModal('compensation')}
+                        className="text-[11px] font-bold text-accent hover:text-accent-hover flex items-center space-x-1"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                        <span>Edit Compensation</span>
+                      </button>
+                    )}
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="p-4 bg-surface-container-low rounded border border-outline-variant/20">
                       <span className="text-[10px] uppercase text-on-surface-variant block font-medium">Fixed Monthly Base CTC</span>
@@ -393,7 +653,18 @@ export const EmployeeProfileView: React.FC = () => {
                 </div>
 
                 <div>
-                  <h3 className="font-serif text-base text-primary font-normal mb-3">Bank Disbursement Coordinates</h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-serif text-base text-primary font-normal">Bank Disbursement Coordinates</h3>
+                    {canEditFinance && (
+                      <button
+                        onClick={() => openEditModal('banking')}
+                        className="text-[11px] font-bold text-accent hover:text-accent-hover flex items-center space-x-1"
+                      >
+                        <Edit3 className="w-3 h-3" />
+                        <span>Edit Bank Coordinates</span>
+                      </button>
+                    )}
+                  </div>
                   {bankDetails ? (
                     <div className="p-4 bg-surface-container-low rounded border border-outline-variant/20 grid grid-cols-2 sm:grid-cols-4 gap-4">
                       <div>
@@ -429,7 +700,18 @@ export const EmployeeProfileView: React.FC = () => {
 
         {activeTab === 'statutory' && (
           <div className="space-y-4 text-xs">
-            <h3 className="font-serif text-base text-primary font-normal">Statutory Registrations & KYC IDs</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-serif text-base text-primary font-normal">Statutory Registrations & KYC IDs</h3>
+              {canEdit && (
+                <button
+                  onClick={() => openEditModal('banking')}
+                  className="text-[11px] font-bold text-accent hover:text-accent-hover flex items-center space-x-1"
+                >
+                  <Edit3 className="w-3 h-3" />
+                  <span>Edit Statutory IDs</span>
+                </button>
+              )}
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="p-4 bg-surface-container-low rounded border border-outline-variant/20 space-y-2">
                 <div className="flex justify-between">
@@ -517,6 +799,412 @@ export const EmployeeProfileView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Comprehensive Edit Employee Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+          <div className="bg-surface-container-lowest max-w-2xl w-full rounded-2xl border border-surface-container-high shadow-elevated overflow-hidden my-auto max-h-[92vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 border-b border-surface-container-high flex items-center justify-between bg-surface-container-low shrink-0">
+              <div className="flex items-center space-x-2.5">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <Edit3 className="w-5 h-5 text-accent" />
+                </div>
+                <div>
+                  <h3 className="font-serif font-bold text-base sm:text-lg text-primary">
+                    Edit Employee: {employee.first_name} {employee.last_name}
+                  </h3>
+                  <p className="text-[11px] text-on-surface-variant font-mono">
+                    ID: {employee.employee_code} • {assignedLegalEntity?.legal_name || 'Client Legal Entity'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(false)}
+                className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Navigation Tabs */}
+            <div className="border-b border-surface-container-high px-4 sm:px-5 flex gap-2 bg-surface-container-lowest shrink-0 overflow-x-auto">
+              {[
+                { key: 'personal', label: '1. Personal Info' },
+                { key: 'org', label: '2. Placement & Roles' },
+                ...(canEditFinance ? [{ key: 'compensation', label: '3. Compensation & CTC' }] : []),
+                { key: 'banking', label: '4. Bank & Statutory KYC' },
+              ].map(t => (
+                <button
+                  key={t.key}
+                  type="button"
+                  onClick={() => setActiveEditTab(t.key as any)}
+                  className={`py-2.5 px-3 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                    activeEditTab === t.key
+                      ? 'border-primary text-primary font-bold'
+                      : 'border-transparent text-on-surface-variant hover:text-on-surface'
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Modal Body / Form */}
+            <form onSubmit={handleSaveEmployeeDetails} className="p-4 sm:p-6 overflow-y-auto space-y-4 flex-1 text-xs">
+              {editError && (
+                <div className="p-3 bg-error/10 border border-error/20 rounded-lg text-xs font-semibold text-error flex items-center space-x-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <span>{editError}</span>
+                </div>
+              )}
+
+              {/* TAB 1: Personal Details */}
+              {activeEditTab === 'personal' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">First Name *</label>
+                      <input
+                        type="text"
+                        value={editFirstName}
+                        onChange={e => setEditFirstName(e.target.value)}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">Last Name *</label>
+                      <input
+                        type="text"
+                        value={editLastName}
+                        onChange={e => setEditLastName(e.target.value)}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">Corporate Email Address *</label>
+                      <input
+                        type="email"
+                        value={editEmail}
+                        onChange={e => setEditEmail(e.target.value)}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">Mobile Phone Number *</label>
+                      <input
+                        type="tel"
+                        value={editMobile}
+                        onChange={e => setEditMobile(e.target.value)}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">Designation / Job Title *</label>
+                      <input
+                        type="text"
+                        value={editDesignation}
+                        onChange={e => setEditDesignation(e.target.value)}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">Date of Joining *</label>
+                      <input
+                        type="date"
+                        value={editJoiningDate}
+                        onChange={e => setEditJoiningDate(e.target.value)}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs font-mono"
+                        required
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="font-bold text-on-surface block mb-1">Employment Lifecycle Status *</label>
+                      <select
+                        value={editStatus}
+                        onChange={e => setEditStatus(e.target.value as any)}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high font-semibold text-xs"
+                      >
+                        <option value="ACTIVE">ACTIVE — Normal operational status</option>
+                        <option value="ON_NOTICE">ON_NOTICE — Serving official resignation notice period</option>
+                        <option value="SUSPENDED">SUSPENDED — Temporary disciplinary or administrative suspension</option>
+                        <option value="TERMINATED">TERMINATED — Discharged or relieved from organisation</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: Organizational Placement */}
+              {activeEditTab === 'org' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div className="sm:col-span-2">
+                      <label className="font-bold text-on-surface block mb-1">Legal Employer / Payroll Entity *</label>
+                      <select
+                        value={editLegalEntityId}
+                        onChange={e => setEditLegalEntityId(e.target.value)}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high font-semibold text-xs"
+                      >
+                        {legalEntities.map(le => (
+                          <option key={le.id} value={le.id}>
+                            {le.legal_name} (PAN: {le.pan})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">Assigned Work Location *</label>
+                      <select
+                        value={editWorkLocationId}
+                        onChange={e => setEditWorkLocationId(e.target.value)}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high font-semibold text-xs"
+                      >
+                        {locations.map(loc => (
+                          <option key={loc.id} value={loc.id}>
+                            {loc.name} ({loc.radius_meters}m geofence)
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">Operational Department</label>
+                      <select
+                        value={editDepartmentId}
+                        onChange={e => setEditDepartmentId(e.target.value)}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high font-semibold text-xs"
+                      >
+                        <option value="">None / General Operations</option>
+                        {departments.map(d => (
+                          <option key={d.id} value={d.id}>
+                            {d.name} ({d.code})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">Employment Arrangement *</label>
+                      <select
+                        value={editArrangement}
+                        onChange={e => setEditArrangement(e.target.value as any)}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high font-semibold text-xs"
+                      >
+                        <option value="DIRECT_PERMANENT">Direct Permanent</option>
+                        <option value="DIRECT_CONTRACT">Direct Contract</option>
+                        <option value="DEPUTED_STAFFING">Deputed Staffing</option>
+                        <option value="INTERN">Intern</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">Employee Code *</label>
+                      <input
+                        type="text"
+                        value={editEmployeeCode}
+                        onChange={e => setEditEmployeeCode(e.target.value.toUpperCase())}
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs font-mono uppercase"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: Compensation & CTC */}
+              {activeEditTab === 'compensation' && canEditFinance && (
+                <div className="space-y-4">
+                  <div className="p-3 bg-surface-container-low rounded-lg border border-surface-container-high text-xs text-on-surface-variant">
+                    Update monthly salary components used by the policy engine for payroll generation and tax proration.
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">Fixed Monthly Base CTC (₹) *</label>
+                      <input
+                        type="number"
+                        value={editFixedMonthlyBase}
+                        onChange={e => setEditFixedMonthlyBase(e.target.value)}
+                        min="0"
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs font-semibold"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">Variable Incentive (₹)</label>
+                      <input
+                        type="number"
+                        value={editVariableIncentives}
+                        onChange={e => setEditVariableIncentives(e.target.value)}
+                        min="0"
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-on-surface block mb-1">Special / Travel Allowances (₹)</label>
+                      <input
+                        type="number"
+                        value={editSpecialAllowances}
+                        onChange={e => setEditSpecialAllowances(e.target.value)}
+                        min="0"
+                        className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 4: Bank Coordinates & KYC */}
+              {activeEditTab === 'banking' && (
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    <span className="font-bold text-primary block">Statutory Identity & Registrations</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                      <div>
+                        <label className="font-bold text-on-surface block mb-1">Permanent Account Number (PAN)</label>
+                        <input
+                          type="text"
+                          value={editPanNumber}
+                          onChange={e => setEditPanNumber(e.target.value.toUpperCase())}
+                          placeholder="ABCDE1234F"
+                          className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs uppercase font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-on-surface block mb-1">Aadhaar UID Number</label>
+                        <input
+                          type="text"
+                          value={editAadhaarNumber}
+                          onChange={e => setEditAadhaarNumber(e.target.value)}
+                          placeholder="12-digit UID"
+                          className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-on-surface block mb-1">Universal Account Number (UAN - EPF)</label>
+                        <input
+                          type="text"
+                          value={editUanNumber}
+                          onChange={e => setEditUanNumber(e.target.value)}
+                          placeholder="12-digit UAN"
+                          className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="font-bold text-on-surface block mb-1">ESIC IP Number</label>
+                        <input
+                          type="text"
+                          value={editEsicNumber}
+                          onChange={e => setEditEsicNumber(e.target.value)}
+                          placeholder="17-digit ESIC IP"
+                          className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs font-mono"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {canEditFinance && (
+                    <div className="pt-3 border-t border-surface-container-high space-y-3">
+                      <span className="font-bold text-primary block">Disbursement Banking Coordinates</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div>
+                          <label className="font-bold text-on-surface block mb-1">Bank Name</label>
+                          <input
+                            type="text"
+                            value={editBankName}
+                            onChange={e => setEditBankName(e.target.value)}
+                            placeholder="e.g. HDFC Bank, ICICI Bank"
+                            className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-on-surface block mb-1">Bank Account Number</label>
+                          <input
+                            type="text"
+                            value={editAccountNumber}
+                            onChange={e => setEditAccountNumber(e.target.value)}
+                            placeholder="Account Number"
+                            className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-on-surface block mb-1">IFSC Branch Code</label>
+                          <input
+                            type="text"
+                            value={editIfscCode}
+                            onChange={e => setEditIfscCode(e.target.value.toUpperCase())}
+                            placeholder="e.g. HDFC0001234"
+                            className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high focus:outline-none focus:border-primary text-xs uppercase font-mono"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-on-surface block mb-1">Account Type</label>
+                          <select
+                            value={editAccountType}
+                            onChange={e => setEditAccountType(e.target.value as 'SAVINGS' | 'CURRENT' | 'SALARY')}
+                            className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high font-semibold text-xs"
+                          >
+                            <option value="SAVINGS">Savings Account</option>
+                            <option value="CURRENT">Current Account</option>
+                            <option value="SALARY">Salary Account</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Modal Footer */}
+              <div className="pt-4 border-t border-surface-container-high flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="px-4 py-2 rounded-lg border border-surface-container-high text-xs font-bold text-on-surface hover:bg-surface-container-low transition-colors"
+                >
+                  Cancel
+                </button>
+
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="submit"
+                    disabled={isSavingEdit}
+                    className="flex items-center space-x-1.5 px-5 py-2.5 rounded-lg bg-accent hover:bg-accent-hover text-white text-xs font-bold transition-all shadow-md disabled:opacity-50"
+                  >
+                    {isSavingEdit ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Saving Changes...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-3.5 h-3.5" />
+                        <span>Save All Changes</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
