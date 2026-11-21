@@ -81,7 +81,7 @@ export const TopNav: React.FC = () => {
                     >
                       <div className="flex items-center space-x-2.5">
                         <div className="w-7 h-7 rounded bg-surface-container-high flex items-center justify-center font-bold text-xs text-primary">
-                          {c.code.substring(0, 2)}
+                          {c.code?.substring(0, 2) || 'CL'}
                         </div>
                         <div>
                           <div className="text-xs font-semibold">{c.name}</div>

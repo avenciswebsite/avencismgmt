@@ -32,7 +32,8 @@ import {
   Smartphone,
   Navigation,
   Sliders,
-  Key
+  Key,
+  Loader2
 } from 'lucide-react';
 import { ChangePasswordModal } from '../../components/auth/ChangePasswordModal';
 
@@ -42,7 +43,7 @@ interface EmployeePortalProps {
 
 export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'punch' }) => {
   const { user } = useAuth();
-  const { currentClient, activeLocations, activeLegalEntity, departments, clientPolicy } = useWorkspace();
+  const { currentClient, activeClientId, availableClients, isLoadingWorkspace, switchClient, activeLocations, activeLegalEntity, departments, clientPolicy } = useWorkspace();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -117,12 +118,29 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
 
   // Data retrieval
   const [employees, setEmployees] = useState<any[]>([]);
+  const [isLoadingEmployees, setIsLoadingEmployees] = useState<boolean>(true);
+
+  const effectiveClientId = currentClient?.id || user?.clientId || activeClientId || (availableClients?.[0]?.id ?? '');
 
   useEffect(() => {
-    if (currentClient?.id) {
-      employeeService.getEmployees({ clientId: currentClient.id }).then(res => {
-        if (res.data) {
-          setEmployees(res.data.map(e => ({
+    let isCancelled = false;
+    const fetchEmployees = async () => {
+      if (!effectiveClientId) {
+        if (!isLoadingWorkspace) setIsLoadingEmployees(false);
+        return;
+      }
+      setIsLoadingEmployees(true);
+      try {
+        const res = await employeeService.getEmployees({ clientId: effectiveClientId });
+        let rawList: any[] = res.data || [];
+        if (rawList.length === 0 && user?.employeeId) {
+          const singleRes = await employeeService.getEmployeeById(user.employeeId);
+          if (singleRes.data) {
+            rawList = [singleRes.data];
+          }
+        }
+        if (!isCancelled) {
+          setEmployees(rawList.map(e => ({
             id: e.id,
             clientId: e.client_id,
             legalEntityId: e.legal_entity_id,
@@ -147,13 +165,31 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
             aadhaarNumber: (e as any).aadhaar || '',
             uanNumber: (e as any).uan_number || '',
             esicNumber: (e as any).esic_number || '',
+            avatarUrl: (e as any).avatar_url || '',
           })));
         }
-      });
-    }
-  }, [currentClient?.id]);
+      } catch (err) {
+        console.error('Error loading employees for portal:', err);
+      } finally {
+        if (!isCancelled) setIsLoadingEmployees(false);
+      }
+    };
+    fetchEmployees();
+    return () => { isCancelled = true; };
+  }, [effectiveClientId, user?.employeeId, isLoadingWorkspace]);
 
-  const currentEmp = employees.find(e => e.email?.toLowerCase() === user?.email?.toLowerCase()) || employees[0];
+  const currentEmp = useMemo(() => {
+    if (user?.employeeId) {
+      const match = employees.find(e => e.id === user.employeeId);
+      if (match) return match;
+    }
+    if (user?.email) {
+      const match = employees.find(e => e.email?.toLowerCase() === user.email?.toLowerCase());
+      if (match) return match;
+    }
+    return employees[0];
+  }, [employees, user?.employeeId, user?.email]);
+
   const departmentName = currentEmp ? (departments.find(d => d.id === currentEmp.departmentId)?.name || 'Operations') : 'Operations';
   const todayAttendance = liveMuster ? {
     checkInTime: liveMuster.check_in_time || liveMuster.checkInTime,
@@ -177,7 +213,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
     endDate: r.end_date,
     totalDays: r.total_days,
     reason: r.reason,
-    status: r.status.toUpperCase(),
+    status: (r.status || 'PENDING').toUpperCase(),
     appliedAt: (r as any).created_at || (r as any).applied_at || new Date().toISOString(),
   }));
   const employeeCorrections = liveCorrections.map(c => ({
@@ -187,13 +223,13 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
     requestedCheckIn: c.requested_check_in,
     requestedCheckOut: c.requested_check_out,
     reason: c.reason,
-    status: c.status.toUpperCase(),
+    status: (c.status || 'PENDING').toUpperCase(),
     managerRemarks: c.manager_remarks,
   }));
   const assignedLocation = currentEmp ? (activeLocations.find(l => l.id === currentEmp.workLocationId) || activeLocations[0]) : undefined;
   const policy = clientPolicy;
 
-  const currentClientId = currentClient?.id;
+  const currentClientId = effectiveClientId;
   const currentEmpId = currentEmp?.id;
   const userRole = user?.role;
   const userClientId = user?.clientId;
@@ -258,11 +294,47 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
     loadLiveAttendance();
   }, [loadLiveAttendance]);
 
-  if (!currentClient || !currentEmp) {
+  if (isLoadingWorkspace || isLoadingEmployees) {
     return (
-      <div className="p-8 text-on-surface-variant bg-surface-container-low rounded-xl border border-outline-variant/30 text-center">
-        <p className="font-semibold text-primary">No active employee profile linked to current session.</p>
-        <p className="text-xs text-on-surface-variant mt-1">Please select an employee persona or client workspace.</p>
+      <div className="min-h-[400px] flex flex-col items-center justify-center p-8 text-on-surface-variant bg-surface-container-low rounded-2xl border border-outline-variant/30 text-center space-y-3">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <p className="font-semibold text-sm text-primary">Loading Employee Self-Service Portal...</p>
+        <p className="text-xs text-on-surface-variant">Connecting to live client attendance and payroll records...</p>
+      </div>
+    );
+  }
+
+  if (!effectiveClientId || !currentEmp) {
+    return (
+      <div className="p-8 text-on-surface-variant bg-surface-container-low rounded-2xl border border-outline-variant/30 text-center space-y-4 max-w-lg mx-auto mt-8 shadow-card">
+        <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
+          <Building2 className="w-6 h-6" />
+        </div>
+        <div>
+          <h2 className="font-serif font-bold text-lg text-primary">No Active Employee Profile Linked</h2>
+          <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
+            {user?.role === 'super_admin'
+              ? 'As Master Super Admin, select a client workspace with registered employees to preview the Employee Self-Service portal.'
+              : 'Your account does not have an active employee profile linked to this workspace.'}
+          </p>
+        </div>
+        {user?.role === 'super_admin' && availableClients.length > 0 && (
+          <div className="pt-2 border-t border-outline-variant/20">
+            <label className="block text-xs font-semibold text-on-surface mb-2">Switch Client Workspace:</label>
+            <div className="flex flex-wrap gap-2 justify-center">
+              {availableClients.map(c => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => switchClient(c.id)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container-high hover:bg-primary hover:text-white transition-colors"
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -542,11 +614,17 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
       */}
       <div className="bg-surface-container-low p-5 sm:p-6 rounded-xl border border-outline-variant/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-4">
-          <img
-            src={currentEmp.avatarUrl}
-            alt={`${currentEmp.firstName} ${currentEmp.lastName}`}
-            className="w-14 h-14 rounded-full object-cover border-2 border-secondary/20 shadow-sm shrink-0"
-          />
+          {currentEmp.avatarUrl ? (
+            <img
+              src={currentEmp.avatarUrl}
+              alt={`${currentEmp.firstName} ${currentEmp.lastName}`}
+              className="w-14 h-14 rounded-full object-cover border-2 border-secondary/20 shadow-sm shrink-0"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg border-2 border-secondary/20 shadow-sm shrink-0">
+              {currentEmp.firstName?.[0] || 'E'}{currentEmp.lastName?.[0] || ''}
+            </div>
+          )}
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary">
@@ -1161,9 +1239,9 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                       <div>
                         <span className="font-bold text-sm text-primary block">Salary Slip — {slip.month}</span>
                         <div className="text-xs text-on-surface-variant flex flex-wrap items-center gap-2 mt-0.5">
-                          <span className="font-semibold text-on-surface">Net Pay: ₹{slip.net.toLocaleString('en-IN')}</span>
+                          <span className="font-semibold text-on-surface">Net Pay: ₹{(slip.net ?? 0).toLocaleString('en-IN')}</span>
                           <span>•</span>
-                          <span>Gross: ₹{slip.gross.toLocaleString('en-IN')}</span>
+                          <span>Gross: ₹{(slip.gross ?? 0).toLocaleString('en-IN')}</span>
                           <span>•</span>
                           <span>{slip.days} Paid Days</span>
                           <span>•</span>
@@ -1261,7 +1339,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                   <div className="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
                     <span className="text-on-surface-variant font-medium">Weekly Off Schedule:</span>
                     <span className="font-bold text-primary font-mono">
-                      {policy?.weeklyOffDays?.join(', ') || 'SUNDAY'}
+                      {Array.isArray(policy?.weeklyOffDays) ? policy.weeklyOffDays.join(', ') : 'SUNDAY'}
                     </span>
                   </div>
                 </div>
@@ -1293,7 +1371,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                   <div className="flex items-center justify-between p-2.5 rounded-lg bg-surface-container-low">
                     <span className="text-on-surface-variant font-medium">Supported Leave Categories:</span>
                     <span className="font-semibold text-on-surface">
-                      {policy?.leaveTypesSupported ? policy.leaveTypesSupported.join(', ') : 'Privilege (PL), Casual (CL), Sick (SL), LWP'}
+                      {Array.isArray(policy?.leaveTypesSupported) ? policy.leaveTypesSupported.join(', ') : 'Privilege (PL), Casual (CL), Sick (SL), LWP'}
                     </span>
                   </div>
 
@@ -1544,31 +1622,31 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                   <div className="p-3 space-y-2">
                     <div className="flex justify-between">
                       <span>Basic Wages</span>
-                      <span className="font-mono font-medium">₹{basic.toLocaleString('en-IN')}</span>
+                      <span className="font-mono font-medium">₹{(basic ?? 0).toLocaleString('en-IN')}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>House Rent Allowance (HRA)</span>
-                      <span className="font-mono font-medium">₹{hra.toLocaleString('en-IN')}</span>
+                      <span className="font-mono font-medium">₹{(hra ?? 0).toLocaleString('en-IN')}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Special Allowance</span>
-                      <span className="font-mono font-medium">₹{specialAllowance.toLocaleString('en-IN')}</span>
+                      <span className="font-mono font-medium">₹{(specialAllowance ?? 0).toLocaleString('en-IN')}</span>
                     </div>
                     {variableIncentives > 0 && (
                       <div className="flex justify-between">
                         <span>Variable Incentives</span>
-                        <span className="font-mono font-medium">₹{variableIncentives.toLocaleString('en-IN')}</span>
+                        <span className="font-mono font-medium">₹{(variableIncentives ?? 0).toLocaleString('en-IN')}</span>
                       </div>
                     )}
                     {overtimePay > 0 && (
                       <div className="flex justify-between text-emerald-700">
                         <span>Authorised Overtime</span>
-                        <span className="font-mono font-medium">+₹{overtimePay.toLocaleString('en-IN')}</span>
+                        <span className="font-mono font-medium">+₹{(overtimePay ?? 0).toLocaleString('en-IN')}</span>
                       </div>
                     )}
                     <div className="border-t border-slate-200 pt-2 flex justify-between font-bold text-slate-900">
                       <span>Gross Earnings</span>
-                      <span className="font-mono">₹{grossEarnings.toLocaleString('en-IN')}</span>
+                      <span className="font-mono">₹{(grossEarnings ?? 0).toLocaleString('en-IN')}</span>
                     </div>
                   </div>
                 </div>
@@ -1581,25 +1659,25 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                   <div className="p-3 space-y-2">
                     <div className="flex justify-between">
                       <span>Provident Fund (PF)</span>
-                      <span className="font-mono font-medium">₹{pf.toLocaleString('en-IN')}</span>
+                      <span className="font-mono font-medium">₹{(pf ?? 0).toLocaleString('en-IN')}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Employee State Insurance (ESI)</span>
-                      <span className="font-mono font-medium">₹{esi.toLocaleString('en-IN')}</span>
+                      <span className="font-mono font-medium">₹{(esi ?? 0).toLocaleString('en-IN')}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Professional Tax (PT)</span>
-                      <span className="font-mono font-medium">₹{pt.toLocaleString('en-IN')}</span>
+                      <span className="font-mono font-medium">₹{(pt ?? 0).toLocaleString('en-IN')}</span>
                     </div>
                     {tds > 0 && (
                       <div className="flex justify-between text-error">
                         <span>Income Tax (TDS)</span>
-                        <span className="font-mono font-medium">₹{tds.toLocaleString('en-IN')}</span>
+                        <span className="font-mono font-medium">₹{(tds ?? 0).toLocaleString('en-IN')}</span>
                       </div>
                     )}
                     <div className="border-t border-slate-200 pt-2 flex justify-between font-bold text-slate-900">
                       <span>Total Deductions</span>
-                      <span className="font-mono">₹{totalDeductions.toLocaleString('en-IN')}</span>
+                      <span className="font-mono">₹{(totalDeductions ?? 0).toLocaleString('en-IN')}</span>
                     </div>
                   </div>
                 </div>
@@ -1610,7 +1688,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                 <div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900">Net Take-Home Salary</span>
                   <div className="font-serif text-2xl font-bold text-emerald-900">
-                    ₹{netPay.toLocaleString('en-IN')}
+                    ₹{(netPay ?? 0).toLocaleString('en-IN')}
                   </div>
                   <span className="text-[10px] text-emerald-700">Transferred via NEFT/RTGS to registered bank account</span>
                 </div>
