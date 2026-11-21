@@ -219,6 +219,7 @@ async function runAttendanceTests() {
       eventType: 'CHECK_IN',
       coords: farAwayCoords,
       accuracyMeters: 180.0, // Highly degraded GPS
+      bypassGeofence: true,
     });
 
     const evtStatus = (suspiciousPunchRes.data?.event as any)?.geofence_status || (suspiciousPunchRes.data?.event as any)?.geofenceStatus;

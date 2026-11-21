@@ -5,12 +5,12 @@ import { attendanceService } from '../../services/attendanceService';
 import { employeeService } from '../../services/employeeService';
 import { policyService } from '../../services/policyService';
 import { CallerScope } from '../../services/serviceTypes';
-import { 
-  MapPin, 
-  Clock, 
-  ShieldCheck, 
-  AlertTriangle, 
-  CheckCircle2, 
+import {
+  MapPin,
+  Clock,
+  ShieldCheck,
+  AlertTriangle,
+  CheckCircle2,
   Navigation,
   RefreshCw,
   LogOut,
@@ -132,8 +132,8 @@ export const MobilePunchCard: React.FC = () => {
 
       // Match employee by user.employeeId or user.email
       let matchedEmp = employees.find(
-        (e: any) => 
-          (user?.employeeId && e.id === user.employeeId) || 
+        (e: any) =>
+          (user?.employeeId && e.id === user.employeeId) ||
           (user?.email && e.email?.toLowerCase() === user.email.toLowerCase())
       );
 
@@ -146,9 +146,9 @@ export const MobilePunchCard: React.FC = () => {
       if (matchedEmp) {
         const todayDate = new Date().toISOString().split('T')[0];
         const attRes = await attendanceService.getTodayAttendance(
-          currentClient.id, 
-          matchedEmp.id, 
-          todayDate, 
+          currentClient.id,
+          matchedEmp.id,
+          todayDate,
           callerScope
         );
 
@@ -206,10 +206,10 @@ export const MobilePunchCard: React.FC = () => {
   let effectiveLocation = primaryLocation;
   let bestGeofenceEval = attendanceService.evaluateGeofence(
     { latitude: coords.lat, longitude: coords.lng },
-    { 
-      latitude: primaryLocation?.latitude || defaultCoords.lat, 
-      longitude: primaryLocation?.longitude || defaultCoords.lng, 
-      radius_meters: (primaryLocation as any)?.radiusMeters || (primaryLocation as any)?.geofence_radius_meters || 150 
+    {
+      latitude: primaryLocation?.latitude || defaultCoords.lat,
+      longitude: primaryLocation?.longitude || defaultCoords.lng,
+      radius_meters: (primaryLocation as any)?.radiusMeters || (primaryLocation as any)?.geofence_radius_meters || 150
     }
   );
 
@@ -246,7 +246,9 @@ export const MobilePunchCard: React.FC = () => {
   const hasCheckedIn = Boolean(todayMuster?.checkInTime);
   const hasCheckedOut = Boolean(todayMuster?.checkOutTime);
   const isShiftCompleted = hasCheckedIn && hasCheckedOut;
-  const canCheckIn = isEmployeeEligible && !hasCheckedIn && !isShiftCompleted;
+  const isStrictGeofence = clientPolicy?.enforceStrictGeofence ?? true;
+  const isGeofenceBlocked = isStrictGeofence && !geofenceEval.isWithinGeofence;
+  const canCheckIn = isEmployeeEligible && !hasCheckedIn && !isShiftCompleted && !isGeofenceBlocked;
   const canCheckOut = isEmployeeEligible && hasCheckedIn && !hasCheckedOut;
 
   // Punch Action Handler
@@ -264,7 +266,7 @@ export const MobilePunchCard: React.FC = () => {
     if (type === 'CHECK_IN' && !canCheckIn) {
       setPunchFeedback({
         type: 'error',
-        message: hasCheckedIn 
+        message: hasCheckedIn
           ? 'Already checked in today. Please record check-out to conclude your shift.'
           : 'Shift already completed for today.',
       });
@@ -289,8 +291,8 @@ export const MobilePunchCard: React.FC = () => {
         eventType: type,
         coords: { latitude: coords.lat, longitude: coords.lng },
         accuracyMeters: accuracy,
-        deviceInfo: typeof navigator !== 'undefined' && navigator.userAgent.includes('Mobile') 
-          ? 'Mobile Browser (MobilePunchCard)' 
+        deviceInfo: typeof navigator !== 'undefined' && navigator.userAgent.includes('Mobile')
+          ? 'Mobile Browser (MobilePunchCard)'
           : 'Desktop Browser Terminal',
         verificationSource: gpsStatus === 'active' ? 'GPS_HARDWARE' : 'BROWSER_TELEMETRY',
       }, callerScope);
@@ -322,11 +324,10 @@ export const MobilePunchCard: React.FC = () => {
     <div className="w-full max-w-2xl mx-auto space-y-5">
       {/* Feedback banner */}
       {punchFeedback && (
-        <div className={`p-4 rounded-xl text-xs flex items-center gap-3 border ${
-          punchFeedback.type === 'success' 
-            ? 'bg-emerald-50 text-emerald-900 border-emerald-200' 
+        <div className={`p-4 rounded-xl text-xs flex items-center gap-3 border ${punchFeedback.type === 'success'
+            ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
             : 'bg-red-50 text-red-900 border-red-200'
-        }`}>
+          }`}>
           {punchFeedback.type === 'success' ? (
             <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
           ) : (
@@ -343,7 +344,7 @@ export const MobilePunchCard: React.FC = () => {
           <div>
             <div className="font-bold text-sm">Attendance Recording Disabled</div>
             <p className="mt-0.5">
-              {isPastLwd 
+              {isPastLwd
                 ? `Your official exit was on ${lastWorkingDay}. Attendance punching is deactivated post-tenure.`
                 : `Your employee record status is ${empStatus}. Only ACTIVE employees are authorized to punch in.`}
             </p>
@@ -472,42 +473,42 @@ export const MobilePunchCard: React.FC = () => {
           <button
             onClick={() => handlePunch('CHECK_IN')}
             disabled={isPunching || !canCheckIn}
-            className={`py-4 px-6 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow ${
-              canCheckIn
+            className={`py-4 px-6 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow ${canCheckIn
                 ? 'bg-primary text-white hover:bg-primary-dark active:scale-[0.98]'
                 : 'bg-surface-container-high text-on-surface-variant cursor-not-allowed opacity-60'
-            }`}
+              }`}
           >
             <Navigation className="w-5 h-5 text-accent-light" />
             <span>
-              {isPunching 
-                ? 'Verifying GPS...' 
-                : isShiftCompleted 
-                ? 'Shift Completed' 
-                : hasCheckedIn 
-                ? 'Already Checked In' 
-                : 'Check-In (Punch)'}
+              {isPunching
+                ? 'Verifying GPS...'
+                : isShiftCompleted
+                  ? 'Shift Completed'
+                  : hasCheckedIn
+                    ? 'Already Checked In'
+                    : isGeofenceBlocked
+                      ? 'Check-In Blocked (Outside Geofence)'
+                      : 'Check-In (Punch)'}
             </span>
           </button>
 
           <button
             onClick={() => handlePunch('CHECK_OUT')}
             disabled={isPunching || !canCheckOut}
-            className={`py-4 px-6 rounded-xl border-2 font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-sm ${
-              canCheckOut
+            className={`py-4 px-6 rounded-xl border-2 font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-sm ${canCheckOut
                 ? 'bg-surface-container-lowest text-primary border-primary/20 hover:border-primary active:scale-[0.98]'
                 : 'bg-surface-container-low text-on-surface-variant border-outline-variant/20 cursor-not-allowed opacity-60'
-            }`}
+              }`}
           >
             <Clock className="w-5 h-5 text-secondary" />
             <span>
-              {isPunching 
-                ? 'Verifying GPS...' 
-                : isShiftCompleted 
-                ? 'Shift Completed' 
-                : !hasCheckedIn 
-                ? 'Check-In Required' 
-                : 'Check-Out (Punch)'}
+              {isPunching
+                ? 'Verifying GPS...'
+                : isShiftCompleted
+                  ? 'Shift Completed'
+                  : !hasCheckedIn
+                    ? 'Check-In Required'
+                    : 'Check-Out (Punch)'}
             </span>
           </button>
         </div>

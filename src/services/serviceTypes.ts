@@ -165,6 +165,7 @@ export interface RecordPunchPayload {
   selfieUrl?: string;
   accuracyMeters?: number;
   verificationSource?: string;
+  bypassGeofence?: boolean;
 }
 
 export interface RegularisationRequestPayload {

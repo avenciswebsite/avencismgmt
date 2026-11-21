@@ -146,6 +146,27 @@ export const attendanceService = {
 
       const isSuspicious = !geofence.isWithinGeofence || (payload.coords.accuracyMeters !== undefined && payload.coords.accuracyMeters > 100);
 
+      // Hard Blocking Guard: Enforce strict geofencing against mock store
+      const mockPolicy = store.getClientPolicy(payload.clientId);
+      const isStrict = mockPolicy?.enforceStrictGeofence ?? true;
+      if (isStrict && !geofence.isWithinGeofence && !payload.bypassGeofence) {
+        store.recordPunch(
+          payload.clientId,
+          payload.employeeId,
+          payload.eventType,
+          { lat: payload.coords.latitude, lng: payload.coords.longitude },
+          payload.deviceInfo || 'Responsive Web App'
+        );
+        const distKm = (geofence.distanceMeters / 1000).toFixed(1);
+        const distDisplay = geofence.distanceMeters >= 1000 ? `${distKm} km` : `${geofence.distanceMeters}m`;
+        return errorResponse(
+          createValidationError(
+            `Punch Blocked: You are ${distDisplay} outside the authorized perimeter for ${loc.name} (${radius}m radius). Under strict company policy, on-site check-ins outside the geofence are blocked. Please submit a Work From Home (WFH) request for today to your Client Head Manager.`,
+            'coords'
+          )
+        );
+      }
+
       // Record in local store
       const { record: storeRec, event: storeEvt } = store.recordPunch(
         payload.clientId,
@@ -267,6 +288,25 @@ export const attendanceService = {
 
       if (eventErr || !eventData) {
         return errorResponse(handleSupabaseError(eventErr, 'attendanceService.recordPunch.events'));
+      }
+
+      // Hard Blocking Guard: Enforce strict geofencing against database policy
+      const { data: clientPolicy } = await supabase
+        .from('client_policies')
+        .select('enforce_strict_geofence')
+        .eq('client_id', payload.clientId)
+        .maybeSingle();
+
+      const isStrict = clientPolicy?.enforce_strict_geofence ?? true;
+      if (isStrict && !geofence.isWithinGeofence && !payload.bypassGeofence) {
+        const distKm = (geofence.distanceMeters / 1000).toFixed(1);
+        const distDisplay = geofence.distanceMeters >= 1000 ? `${distKm} km` : `${geofence.distanceMeters}m`;
+        return errorResponse(
+          createValidationError(
+            `Punch Blocked: You are ${distDisplay} outside the authorized perimeter for ${assignedLoc.name} (${assignedLoc.radius_meters}m radius). Under strict company policy, on-site check-ins outside the geofence are blocked. Please submit a Work From Home (WFH) request for today to your Client Head Manager.`,
+            'coords'
+          )
+        );
       }
 
       // 2. Update or Insert Daily Attendance Record for today
@@ -813,22 +853,85 @@ export const attendanceService = {
 
       // If approved, update daily_attendance_records to reflect adjusted check-in and check-out
       if (decision.status === 'APPROVED' && data) {
-        await supabase
+        const isWfh = data.reason?.includes('[WORK_FROM_HOME]') || data.reason?.includes('[WFH]');
+        const locationName = isWfh ? 'Work From Home' : 'Regularised Attendance';
+
+        const { data: existingRec } = await supabase
           .from('daily_attendance_records')
-          .update({
-            check_in_time: data.requested_check_in,
-            check_out_time: data.requested_check_out,
-            is_regularised: true,
-            status: 'PRESENT',
-            updated_at: new Date().toISOString(),
-          })
+          .select('id')
           .eq('employee_id', data.employee_id)
-          .eq('date', data.date);
+          .eq('date', data.date)
+          .maybeSingle();
+
+        if (existingRec) {
+          await supabase
+            .from('daily_attendance_records')
+            .update({
+              check_in_time: data.requested_check_in,
+              check_out_time: data.requested_check_out,
+              is_regularised: true,
+              location_name: locationName,
+              status: 'PRESENT',
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', existingRec.id);
+        } else {
+          // If employee was hard-blocked from on-site punch, create the daily attendance record now
+          await supabase
+            .from('daily_attendance_records')
+            .insert({
+              client_id: data.client_id,
+              employee_id: data.employee_id,
+              date: data.date,
+              check_in_time: data.requested_check_in,
+              check_out_time: data.requested_check_out,
+              total_hours: 8.5,
+              is_regularised: true,
+              location_name: locationName,
+              status: 'PRESENT',
+            });
+        }
       }
 
       return successResponse(data);
     } catch (err) {
       return errorResponse(handleSupabaseError(err, 'attendanceService.reviewRegularisation'));
     }
+  },
+
+  /**
+   * Submits a Work From Home (WFH) request for an employee on a given date.
+   * Reviewed and approved by the Client Head Manager / Tenant Admin.
+   */
+  async submitWfhRequest(
+    payload: {
+      clientId: string;
+      employeeId: string;
+      date: string;
+      reason: string;
+      requestedCheckIn?: string;
+      requestedCheckOut?: string;
+    },
+    callerScope?: CallerScope
+  ): Promise<ServiceResponse<AttendanceCorrectionRow>> {
+    if (!payload.clientId || !payload.employeeId) {
+      return errorResponse(createValidationError('Client ID and Employee ID are required.'));
+    }
+    if (!payload.date) {
+      return errorResponse(createValidationError('Date is required.', 'date'));
+    }
+    if (!payload.reason || payload.reason.trim().length < 5) {
+      return errorResponse(createValidationError('Please enter a substantive reason for working from home (at least 5 characters).', 'reason'));
+    }
+
+    const wfhReason = `[WORK_FROM_HOME] ${payload.reason.trim()}`;
+    return this.submitRegularisation({
+      clientId: payload.clientId,
+      employeeId: payload.employeeId,
+      date: payload.date,
+      requestedCheckIn: payload.requestedCheckIn || '09:00 AM',
+      requestedCheckOut: payload.requestedCheckOut || '06:00 PM',
+      reason: wfhReason,
+    }, callerScope);
   },
 };

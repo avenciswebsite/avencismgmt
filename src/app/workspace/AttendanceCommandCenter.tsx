@@ -23,7 +23,8 @@ import {
   ShieldAlert,
   ArrowRight,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  Home
 } from 'lucide-react';
 
 export const AttendanceCommandCenter: React.FC = () => {
@@ -409,8 +410,17 @@ export const AttendanceCommandCenter: React.FC = () => {
 
                     <td className="py-3 px-4 text-on-surface-variant">
                       <div className="flex items-center space-x-1">
-                        <MapPin className="w-3.5 h-3.5 text-accent shrink-0" />
-                        <span className="truncate max-w-[160px]">{rec.resolvedLocationName}</span>
+                        {rec.location_name === 'Work From Home' || rec.resolvedLocationName === 'Work From Home' ? (
+                          <>
+                            <Home className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                            <span className="truncate max-w-[160px] font-bold text-blue-800">Work From Home</span>
+                          </>
+                        ) : (
+                          <>
+                            <MapPin className="w-3.5 h-3.5 text-accent shrink-0" />
+                            <span className="truncate max-w-[160px]">{rec.resolvedLocationName}</span>
+                          </>
+                        )}
                       </div>
                     </td>
 

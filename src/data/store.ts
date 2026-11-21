@@ -1,35 +1,35 @@
-import { 
-  Client, 
-  ClientLegalEntity, 
-  WorkLocation, 
-  Department, 
-  ClientPolicy, 
-  Employee, 
-  DailyAttendanceRecord, 
-  AttendanceEvent, 
-  AttendanceCorrection, 
-  LeaveBalance, 
-  LeaveRequest, 
-  PayrollRun, 
-  PayrollItem, 
+import {
+  Client,
+  ClientLegalEntity,
+  WorkLocation,
+  Department,
+  ClientPolicy,
+  Employee,
+  DailyAttendanceRecord,
+  AttendanceEvent,
+  AttendanceCorrection,
+  LeaveBalance,
+  LeaveRequest,
+  PayrollRun,
+  PayrollItem,
   Payslip,
-  AuditLog, 
-  User 
+  AuditLog,
+  User
 } from '../types';
-import { 
-  INITIAL_USERS, 
-  INITIAL_CLIENTS, 
-  INITIAL_LEGAL_ENTITIES, 
-  INITIAL_LOCATIONS, 
-  INITIAL_DEPARTMENTS, 
-  INITIAL_POLICIES, 
-  INITIAL_EMPLOYEES, 
-  INITIAL_ATTENDANCE_RECORDS, 
-  INITIAL_CORRECTIONS, 
-  INITIAL_LEAVE_BALANCES, 
-  INITIAL_LEAVE_REQUESTS, 
-  INITIAL_PAYROLL_RUNS, 
-  INITIAL_AUDIT_LOGS 
+import {
+  INITIAL_USERS,
+  INITIAL_CLIENTS,
+  INITIAL_LEGAL_ENTITIES,
+  INITIAL_LOCATIONS,
+  INITIAL_DEPARTMENTS,
+  INITIAL_POLICIES,
+  INITIAL_EMPLOYEES,
+  INITIAL_ATTENDANCE_RECORDS,
+  INITIAL_CORRECTIONS,
+  INITIAL_LEAVE_BALANCES,
+  INITIAL_LEAVE_REQUESTS,
+  INITIAL_PAYROLL_RUNS,
+  INITIAL_AUDIT_LOGS
 } from './mockData';
 import { calculateEffectiveLeaveDays } from '../services/leaveCalculationHelper';
 import {
@@ -90,7 +90,7 @@ class AppStore {
         'avencis_wfm_payslips',
         'avencis_wfm_audit_logs',
       ];
-      
+
       const rawClients = localStorage.getItem('avencis_wfm_clients');
       if (rawClients && (rawClients.includes('client-suman') || rawClients.includes('Suman Technologies'))) {
         legacyKeys.forEach(k => localStorage.removeItem(k));
@@ -145,7 +145,7 @@ class AppStore {
       activeLocationsCount: 0,
     };
     this.clients.unshift(newClient);
-    
+
     // Initialize unconfigured policy
     this.policies[newClient.id] = {
       id: `pol-${newClient.id}`,
@@ -363,7 +363,7 @@ class AppStore {
       id: `emp-${Date.now().toString(36)}`,
     };
     this.employees.unshift(newEmp);
-    
+
     // Update client employee count
     const client = this.getClient(empData.clientId);
     if (client) client.employeeCount++;
@@ -401,9 +401,9 @@ class AppStore {
   }
 
   recordPunch(
-    clientId: string, 
-    employeeId: string, 
-    eventType: 'CHECK_IN' | 'CHECK_OUT', 
+    clientId: string,
+    employeeId: string,
+    eventType: 'CHECK_IN' | 'CHECK_OUT',
     coords: { lat: number; lng: number },
     deviceInfo = 'Chrome Mobile on Android'
   ): { record: DailyAttendanceRecord; event: AttendanceEvent } {
@@ -418,7 +418,7 @@ class AppStore {
     // Check against all authorized client locations: if employee is within ANY authorized location's geofence radius, accept it!
     const clientLocations = this.locations.filter(l => l.clientId === clientId);
     const assignedLocation = this.locations.find(l => l.id === employee.workLocationId) || clientLocations[0] || this.locations[0];
-    
+
     let matchedLocation = assignedLocation;
     let withinGeofence = false;
     let distanceMeters = this.calculateDistance(coords.lat, coords.lng, assignedLocation.latitude, assignedLocation.longitude);
@@ -489,9 +489,9 @@ class AppStore {
     }
 
     this.logAction(
-      eventType, 
-      'AttendanceEvent', 
-      event.id, 
+      eventType,
+      'AttendanceEvent',
+      event.id,
       `Recorded ${eventType} for ${employee.firstName} ${employee.lastName} (${geofenceStatus})`
     );
     this.saveToStorage();
@@ -533,13 +533,31 @@ class AppStore {
       corr.managerRemarks = managerRemarks;
 
       if (status === 'APPROVED') {
-        // Overlay update on daily record
+        const isWfh = corr.reason?.includes('[WORK_FROM_HOME]') || corr.reason?.includes('[WFH]');
+        const locationName = isWfh ? 'Work From Home' : 'Regularised Attendance';
+        // Overlay update on daily record, or create if employee was hard-blocked from on-site punch
         const daily = this.attendanceRecords.find(r => r.employeeId === corr.employeeId && r.date === corr.date);
         if (daily) {
           daily.checkInTime = corr.requestedCheckIn;
           daily.checkOutTime = corr.requestedCheckOut;
           daily.isRegularised = true;
+          daily.locationName = locationName;
           daily.status = 'PRESENT';
+        } else {
+          this.attendanceRecords.push({
+            id: `att-${Date.now().toString(36)}`,
+            clientId: corr.clientId,
+            employeeId: corr.employeeId,
+            date: corr.date,
+            checkInTime: corr.requestedCheckIn,
+            checkOutTime: corr.requestedCheckOut,
+            totalHours: 8.5,
+            status: 'PRESENT',
+            locationName,
+            isRegularised: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          });
         }
       }
 
@@ -674,7 +692,7 @@ class AppStore {
             }
           }
         }
-        this.attendanceRecords = this.attendanceRecords.filter(a => 
+        this.attendanceRecords = this.attendanceRecords.filter(a =>
           a.leaveRequestId !== req.id || (a.checkInTime !== undefined || a.totalHours > 0 || a.isRegularised)
         );
       }
@@ -693,7 +711,7 @@ class AppStore {
           delete a.leaveRequestId;
         }
       }
-      this.attendanceRecords = this.attendanceRecords.filter(a => 
+      this.attendanceRecords = this.attendanceRecords.filter(a =>
         a.leaveRequestId !== req.id || (a.checkInTime !== undefined || a.totalHours > 0 || a.isRegularised)
       );
       this.logAction('LEAVE_CANCEL', 'LeaveRequest', id, `Cancelled leave request`);
@@ -740,9 +758,9 @@ class AppStore {
   }
 
   calculatePayrollRun(
-    clientId: string, 
-    periodMonth: number, 
-    periodYear: number, 
+    clientId: string,
+    periodMonth: number,
+    periodYear: number,
     options?: {
       legalEntityId?: string;
       overtimeOverrides?: Record<string, number>;
@@ -919,9 +937,9 @@ class AppStore {
     }
 
     this.logAction(
-      'PAYROLL_LOCKED', 
-      'PayrollRun', 
-      run.id, 
+      'PAYROLL_LOCKED',
+      'PayrollRun',
+      run.id,
       `Authorized and locked payroll for period ${run.periodMonth}/${run.periodYear} (Net: ₹${run.totalNet.toLocaleString('en-IN')})`,
       'critical'
     );
@@ -937,10 +955,10 @@ class AppStore {
   }
 
   logAction(
-    action: string, 
-    targetEntity: string, 
-    targetId: string, 
-    details: string, 
+    action: string,
+    targetEntity: string,
+    targetId: string,
+    details: string,
     severity: 'info' | 'warning' | 'critical' = 'info',
     actorName = 'Avencis Global Administrator',
     actorRole: 'super_admin' | 'client_admin' | 'employee' = 'super_admin',

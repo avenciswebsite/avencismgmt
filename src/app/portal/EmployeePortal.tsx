@@ -26,6 +26,7 @@ import {
   Download, 
   X, 
   Building2, 
+  Home, 
   UserCheck, 
   Sparkles, 
   ChevronRight, 
@@ -112,6 +113,11 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
   const [regCheckIn, setRegCheckIn] = useState<string>('09:00 AM');
   const [regCheckOut, setRegCheckOut] = useState<string>('06:00 PM');
   const [regReason, setRegReason] = useState<string>('');
+
+  // Work From Home (WFH) Request state
+  const [showWfhModal, setShowWfhModal] = useState<boolean>(false);
+  const [wfhReason, setWfhReason] = useState<string>('');
+  const [isSubmittingWfh, setIsSubmittingWfh] = useState<boolean>(false);
   const [regSuccess, setRegSuccess] = useState<boolean>(false);
 
   // Payslip Modal state
@@ -379,8 +385,58 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
   const effectiveTotalHours = liveMuster ? ((liveMuster as any).totalHours ?? (liveMuster as any).total_hours) : todayAttendance?.totalHours;
   const isAlreadyCheckedIn = Boolean(effectiveInTime && !effectiveOutTime);
   const isShiftCompleted = Boolean(effectiveInTime && effectiveOutTime);
-  const canCheckIn = !isAlreadyCheckedIn && !isShiftCompleted;
+  const isStrictGeofence = policy?.enforceStrictGeofence ?? true;
+  const isGeofenceBlocked = isStrictGeofence && !geofenceEval.isWithinGeofence;
+  const canCheckIn = !isAlreadyCheckedIn && !isShiftCompleted && !isGeofenceBlocked;
   const canCheckOut = isAlreadyCheckedIn && !isShiftCompleted;
+
+  // Handle Work From Home (WFH) Submission
+  const handleApplyWfh = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentClientId || !currentEmpId) return;
+    if (!wfhReason.trim() || wfhReason.trim().length < 5) {
+      setPunchFeedback({
+        type: 'error',
+        message: 'Please provide a substantive reason for working from home (at least 5 characters).'
+      });
+      return;
+    }
+
+    setIsSubmittingWfh(true);
+    try {
+      const todayDate = new Date().toISOString().split('T')[0];
+      const res = await attendanceService.submitWfhRequest({
+        clientId: currentClientId,
+        employeeId: currentEmpId,
+        date: todayDate,
+        reason: wfhReason.trim(),
+        requestedCheckIn: '09:00 AM',
+        requestedCheckOut: '06:00 PM',
+      }, callerScope);
+
+      if (res.data) {
+        setPunchFeedback({
+          type: 'success',
+          message: 'Work From Home (WFH) request submitted for today! Your Client Head Manager will review and approve your remote workday.'
+        });
+        setShowWfhModal(false);
+        setWfhReason('');
+        await loadLiveAttendance();
+      } else {
+        setPunchFeedback({
+          type: 'error',
+          message: res.error?.message || 'Failed to submit WFH request.'
+        });
+      }
+    } catch (err: any) {
+      setPunchFeedback({
+        type: 'error',
+        message: err.message || 'An unexpected error occurred while submitting WFH request.'
+      });
+    } finally {
+      setIsSubmittingWfh(false);
+    }
+  };
 
   // Handle Punch In / Out via attendanceService
   const handlePunch = async (type: 'CHECK_IN' | 'CHECK_OUT') => {
@@ -812,6 +868,39 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                     </div>
                   </div>
 
+                  {/* WFH Request Banner when Outside Geofence */}
+                  {isGeofenceBlocked && !isAlreadyCheckedIn && !isShiftCompleted && (
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-xs space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                            <Home className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-xs text-blue-950">Working from Home Today?</h4>
+                            <p className="text-[10px] text-blue-800/80">
+                              You are {geofenceEval.distanceMeters >= 1000 ? `${(geofenceEval.distanceMeters / 1000).toFixed(1)} km` : `${geofenceEval.distanceMeters}m`} outside the {assignedLocation?.name || 'facility'} perimeter.
+                            </p>
+                          </div>
+                        </div>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-200/60 text-blue-900 border border-blue-300 shrink-0">
+                          Strict Geofence
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-blue-900/90 leading-relaxed">
+                        On-site check-in is blocked. Instead of an attendance regularisation, you can request <strong>Work From Home (WFH)</strong> for today, which will be submitted directly to your Client Head Manager for authorization.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setShowWfhModal(true)}
+                        className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-2 rounded-lg transition-all shadow-sm"
+                      >
+                        <Home className="w-3.5 h-3.5" />
+                        <span>Request Work From Home (WFH) for Today</span>
+                      </button>
+                    </div>
+                  )}
+
                   {/* Large Touch/Click Punch Buttons */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                     <button
@@ -831,6 +920,8 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                           ? 'Shift Completed' 
                           : isAlreadyCheckedIn 
                           ? 'Already Checked In' 
+                          : isGeofenceBlocked
+                          ? 'Check-In Blocked (Outside Geofence)'
                           : 'Punch In (Check-In)'}
                       </span>
                     </button>
@@ -1209,7 +1300,16 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                         <tr key={corr.id}>
                           <td className="py-3 font-bold text-primary">{corr.date}</td>
                           <td className="py-3">{reqIn} – {reqOut}</td>
-                          <td className="py-3 text-on-surface-variant truncate max-w-[200px]">{corr.reason}</td>
+                          <td className="py-3 text-on-surface-variant max-w-[260px]">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              {corr.reason?.includes('[WORK_FROM_HOME]') && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-100 text-blue-800 border border-blue-200 shrink-0">
+                                  WFH Request
+                                </span>
+                              )}
+                              <span className="truncate">{corr.reason?.replace('[WORK_FROM_HOME]', '').trim()}</span>
+                            </div>
+                          </td>
                           <td className="py-3 text-right">
                             <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
                               status === 'APPROVED' ? 'bg-emerald-100 text-emerald-800' :
@@ -1747,6 +1847,103 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
                 <span>Download PDF</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Work From Home (WFH) Request Modal */}
+      {showWfhModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-surface-container-lowest rounded-2xl max-w-lg w-full border border-outline-variant/30 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-5 border-b border-outline-variant/20 flex items-center justify-between bg-surface-container-low/50">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                  <Home className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-serif font-bold text-base text-primary">Apply for Work From Home (WFH)</h3>
+                  <p className="text-[11px] text-on-surface-variant">Submit remote workday request to Client Head Manager</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowWfhModal(false)}
+                className="p-1 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleApplyWfh} className="p-6 space-y-4 text-xs">
+              {/* Telemetry Dossier */}
+              <div className="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200/70 space-y-1.5 text-blue-950">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-on-surface-variant font-medium">Assigned Location:</span>
+                  <span className="font-bold">{assignedLocation?.name || 'Talegaon Plant'}</span>
+                </div>
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-on-surface-variant font-medium">Current Distance:</span>
+                  <span className="font-bold text-amber-700">
+                    {geofenceEval.distanceMeters >= 1000 ? `${(geofenceEval.distanceMeters / 1000).toFixed(1)} km` : `${geofenceEval.distanceMeters}m`} outside geofence
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-on-surface-variant font-medium">Remote Work Date:</span>
+                  <span className="font-bold">{currentDateFormatted || new Date().toDateString()}</span>
+                </div>
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-on-surface-variant font-medium">Reviewing Authority:</span>
+                  <span className="font-bold text-blue-700">Client Head Manager</span>
+                </div>
+              </div>
+
+              {/* Reason / Tasks */}
+              <div>
+                <label className="block font-bold text-on-surface mb-1.5">
+                  Tasks & Justification for Remote Work <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  rows={4}
+                  required
+                  value={wfhReason}
+                  onChange={(e) => setWfhReason(e.target.value)}
+                  placeholder="e.g. Working remotely today on software development, cloud infrastructure maintenance, and system documentation..."
+                  className="w-full p-3 rounded-xl border border-outline-variant/40 bg-surface-container-low text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 resize-none transition-all"
+                />
+                <p className="text-[10px] text-on-surface-variant mt-1">
+                  Once approved by your Client Head Manager, your daily attendance muster will be credited as <strong>PRESENT (Work From Home)</strong> with full payable shift hours.
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-outline-variant/20">
+                <button
+                  type="button"
+                  onClick={() => setShowWfhModal(false)}
+                  className="px-4 py-2 rounded-xl border border-outline-variant/40 hover:bg-surface-container-high text-on-surface font-semibold text-xs transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingWfh || !wfhReason.trim()}
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmittingWfh ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Home className="w-3.5 h-3.5" />
+                      <span>Submit WFH Request to Manager</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
