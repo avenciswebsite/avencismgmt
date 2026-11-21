@@ -54,7 +54,7 @@
 | **`employee_salary_structures`** | ALL | ALL (Own) | NO ACCESS | ALL (Own) | NO ACCESS | NO ACCESS | SELECT (Self Active) |
 | **`employee_bank_details`** | ALL | ALL (Own) | NO ACCESS | ALL (Own) | NO ACCESS | NO ACCESS | SELECT (Self) |
 | **`attendance_events`** | SELECT (All) | SELECT (Own) | SELECT (Own) | SELECT (Own) | SELECT (Team) | SELECT (Site) | INSERT & SELECT (Self) |
-| **`daily_attendance_records`** | ALL | ALL (Own) | ALL (Own) | SELECT (Own) | ALL (Team) | ALL (Site) | SELECT (Self) |
+| **`daily_attendance_records`** | ALL | ALL (Own) | ALL (Own) | SELECT (Own) | ALL (Team) | ALL (Site) | SELECT, INSERT & UPDATE (Self) |
 | **`attendance_corrections`** | ALL | ALL (Own) | ALL (Own) | NO ACCESS | ALL (Team) | ALL (Site) | INSERT & SELECT (Self) |
 | **`leave_balances`** | ALL | ALL (Own) | ALL (Own) | SELECT (Own) | SELECT (Team) | SELECT (Site) | SELECT (Self) |
 | **`leave_requests`** | ALL | ALL (Own) | ALL (Own) | SELECT (Own) | ALL (Team) | ALL (Site) | INSERT & SELECT (Self) |

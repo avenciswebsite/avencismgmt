@@ -990,6 +990,8 @@ CREATE POLICY "daily_attendance_tenant_admin_all" ON public.daily_attendance_rec
 USING (client_id = public.get_user_client_id() AND public.get_user_role() IN ('client_admin', 'hr_admin', 'client_manager', 'location_manager'))
 WITH CHECK (client_id = public.get_user_client_id() AND public.get_user_role() IN ('client_admin', 'hr_admin', 'client_manager', 'location_manager'));
 CREATE POLICY "daily_attendance_employee_select" ON public.daily_attendance_records FOR SELECT TO authenticated USING (employee_id = public.get_user_employee_id());
+CREATE POLICY "daily_attendance_employee_insert" ON public.daily_attendance_records FOR INSERT TO authenticated WITH CHECK (employee_id = public.get_user_employee_id() AND client_id = public.get_user_client_id());
+CREATE POLICY "daily_attendance_employee_update" ON public.daily_attendance_records FOR UPDATE TO authenticated USING (employee_id = public.get_user_employee_id() AND client_id = public.get_user_client_id()) WITH CHECK (employee_id = public.get_user_employee_id() AND client_id = public.get_user_client_id());
 
 CREATE POLICY "corrections_employee_apply" ON public.attendance_corrections FOR INSERT TO authenticated WITH CHECK (employee_id = public.get_user_employee_id() AND client_id = public.get_user_client_id());
 CREATE POLICY "corrections_employee_select" ON public.attendance_corrections FOR SELECT TO authenticated USING (employee_id = public.get_user_employee_id());
