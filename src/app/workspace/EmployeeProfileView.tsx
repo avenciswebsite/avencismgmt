@@ -38,7 +38,10 @@ import {
   Layers,
   DollarSign,
   AlertTriangle,
-  Loader2
+  Loader2,
+  UserX,
+  UserCheck,
+  RotateCcw
 } from 'lucide-react';
 
 export const EmployeeProfileView: React.FC = () => {
@@ -118,6 +121,64 @@ export const EmployeeProfileView: React.FC = () => {
   const [editAadhaarNumber, setEditAadhaarNumber] = useState('');
   const [editUanNumber, setEditUanNumber] = useState('');
   const [editEsicNumber, setEditEsicNumber] = useState('');
+
+  // Deletion / Access Revocation Modal State
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showReactivateModal, setShowReactivateModal] = useState(false);
+  const [terminationReason, setTerminationReason] = useState('Resignation / Separation');
+  const [lastWorkingDay, setLastWorkingDay] = useState(new Date().toISOString().split('T')[0]);
+  const [isActionLoading, setIsActionLoading] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const handleConfirmDelete = async () => {
+    if (!employee) return;
+    setIsActionLoading(true);
+    setActionError(null);
+    try {
+      const res = await employeeService.deleteEmployee(
+        employee.id,
+        { reason: terminationReason, lastWorkingDay },
+        callerScope
+      );
+      if (!res.success) {
+        setActionError(res.error?.message || 'Failed to remove employee.');
+        setIsActionLoading(false);
+        return;
+      }
+      setShowDeleteModal(false);
+      setEditSuccessMsg(
+        `Employee ${employee.first_name} ${employee.last_name} removed. System login and ESS portal access revoked. Historical payrolls, payslips, and attendance muster remain fully retained.`
+      );
+      await loadProfile();
+    } catch (err: any) {
+      setActionError(err.message || 'An unexpected error occurred.');
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleConfirmReactivate = async () => {
+    if (!employee) return;
+    setIsActionLoading(true);
+    setActionError(null);
+    try {
+      const res = await employeeService.reactivateEmployee(employee.id, callerScope);
+      if (!res.success) {
+        setActionError(res.error?.message || 'Failed to reactivate employee.');
+        setIsActionLoading(false);
+        return;
+      }
+      setShowReactivateModal(false);
+      setEditSuccessMsg(
+        `Employee ${employee.first_name} ${employee.last_name} reactivated successfully. ESS portal login access restored.`
+      );
+      await loadProfile();
+    } catch (err: any) {
+      setActionError(err.message || 'An unexpected error occurred.');
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
 
   const openEditModal = useCallback((tab: 'personal' | 'org' | 'compensation' | 'banking' = 'personal') => {
     if (!employee) return;
@@ -408,15 +469,52 @@ export const EmployeeProfileView: React.FC = () => {
           <span>Back to Employee Master</span>
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {canEdit && (
-            <button
-              onClick={() => openEditModal('personal')}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-primary text-white rounded text-xs font-bold hover:bg-primary-dark transition-colors shadow-sm"
-            >
-              <Edit3 className="w-3.5 h-3.5" />
-              <span>Edit Employee</span>
-            </button>
+            <>
+              <button
+                onClick={() => openEditModal('personal')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded text-xs font-bold hover:bg-primary-dark transition-colors shadow-sm"
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+                <span>Edit Employee</span>
+              </button>
+
+              {employee.status !== 'TERMINATED' ? (
+                <button
+                  type="button"
+                  disabled={employee.id === userEmpId}
+                  onClick={() => {
+                    if (employee.id === userEmpId) return;
+                    setShowDeleteModal(true);
+                    setTerminationReason('Resignation / Separation');
+                    setLastWorkingDay(new Date().toISOString().split('T')[0]);
+                    setActionError(null);
+                  }}
+                  title={employee.id === userEmpId ? 'Cannot remove your own active profile' : 'Remove Employee & Revoke Access'}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-bold transition-colors shadow-sm ${
+                    employee.id === userEmpId
+                      ? 'opacity-40 cursor-not-allowed bg-surface-container text-on-surface-variant'
+                      : 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800 cursor-pointer'
+                  }`}
+                >
+                  <UserX className="w-3.5 h-3.5" />
+                  <span>Remove Employee</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowReactivateModal(true);
+                    setActionError(null);
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 text-white rounded text-xs font-bold hover:bg-emerald-700 transition-colors shadow-sm cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reactivate Employee</span>
+                </button>
+              )}
+            </>
           )}
           <button
             onClick={() => loadProfile()}
@@ -434,6 +532,24 @@ export const EmployeeProfileView: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Terminated Employee Access Revocation Banner */}
+      {employee.status === 'TERMINATED' && (
+        <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/60 rounded-xl space-y-1.5 text-xs text-red-900 dark:text-red-200">
+          <div className="flex items-center space-x-2 font-bold text-red-700 dark:text-red-300">
+            <UserX className="w-4 h-4 text-red-600 shrink-0" />
+            <span>Employee Record Terminated & System Access Revoked</span>
+          </div>
+          <p className="text-[11px] text-red-800/90 dark:text-red-300/90 leading-relaxed">
+            All portal login privileges, attendance punch telemetry, and self-service capabilities have been permanently revoked. 
+            Under Indian statutory compliance (The Contract Labour Act 1970 Form XIX Wage Register, Minimum Wages Act, and EPF/ESIC guidelines), all past payroll runs, salary slips, leave ledgers, and attendance history remain preserved for legal audits.
+          </p>
+          <div className="flex flex-wrap gap-4 text-[11px] pt-1.5 border-t border-red-200/60 dark:border-red-800/40 font-medium">
+            <span><strong>Last Working Day:</strong> {employee.last_working_day || 'Recorded at termination'}</span>
+            <span><strong>Reason:</strong> {employee.termination_reason || 'Separation / Termination'}</span>
+          </div>
+        </div>
+      )}
 
       {editSuccessMsg && (
         <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs font-semibold text-emerald-800 dark:text-emerald-300 flex items-center justify-between">
@@ -1202,6 +1318,196 @@ export const EmployeeProfileView: React.FC = () => {
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal: Remove Employee & Revoke System Access */}
+      {showDeleteModal && employee && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-elevated border border-surface-container-high max-w-lg w-full overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-5 border-b border-surface-container-high flex items-center justify-between bg-red-50/50 dark:bg-red-950/20">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/50 text-red-600 flex items-center justify-center">
+                  <UserX className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-serif font-bold text-red-950 dark:text-red-100">
+                    Remove Employee & Revoke Access
+                  </h3>
+                  <p className="text-xs text-on-surface-variant">
+                    {employee.first_name} {employee.last_name} ({employee.employee_code})
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isActionLoading}
+                className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 space-y-4 text-xs">
+              {/* Statutory Compliance Notice Banner */}
+              <div className="p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl space-y-2">
+                <div className="flex items-center space-x-2 text-amber-900 dark:text-amber-200 font-bold">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>Statutory Compliance & Data Retention Guarantee</span>
+                </div>
+                <p className="text-amber-800 dark:text-amber-300 leading-relaxed text-[11px]">
+                  Under Indian labor laws (The Contract Labour Act 1970 Form XIX Wage Register, Minimum Wages Act, and EPF/ESIC statutory inspection rules), staff wage records are legally protected:
+                </p>
+                <ul className="list-disc list-inside space-y-1 text-amber-800/90 dark:text-amber-300/90 text-[11px]">
+                  <li><strong>Access Revocation:</strong> The employee’s login and active portal sessions will be terminated immediately. They will not be able to punch attendance or submit requests.</li>
+                  <li><strong>Complete Data Retention:</strong> All past payrolls, current payroll items, payslips, Form XIX registers, and attendance muster logs remain 100% accessible in the client directory and dashboard.</li>
+                </ul>
+              </div>
+
+              {/* Form Inputs */}
+              <div className="space-y-3 pt-1">
+                <div>
+                  <label className="block text-xs font-semibold text-on-surface mb-1">
+                    Termination Reason <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={terminationReason}
+                    onChange={e => setTerminationReason(e.target.value)}
+                    className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high font-medium text-xs focus:outline-none focus:border-red-500"
+                  >
+                    <option value="Resignation / Separation">Voluntary Resignation / Separation</option>
+                    <option value="Contract Completion">End of Fixed-Term Contract</option>
+                    <option value="Role Redundancy">Role Redundancy / Restructuring</option>
+                    <option value="Performance / Disciplinary">Performance / Disciplinary Action</option>
+                    <option value="Absconding / Job Abandonment">Absconding / Job Abandonment</option>
+                    <option value="Retirement">Statutory Retirement</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-on-surface mb-1">
+                    Last Working Day (LWD) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={lastWorkingDay}
+                    onChange={e => setLastWorkingDay(e.target.value)}
+                    className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high font-medium text-xs focus:outline-none focus:border-red-500"
+                  />
+                </div>
+              </div>
+
+              {actionError && (
+                <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 text-red-700 text-xs rounded-lg flex items-center space-x-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{actionError}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-surface-container-low border-t border-surface-container-high flex items-center justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={isActionLoading}
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isActionLoading}
+                className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors flex items-center space-x-1.5 shadow-sm"
+              >
+                {isActionLoading ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Revoking Access...</span>
+                  </>
+                ) : (
+                  <>
+                    <UserX className="w-3.5 h-3.5" />
+                    <span>Confirm Removal & Revoke Access</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal: Reactivate Employee */}
+      {showReactivateModal && employee && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-elevated border border-surface-container-high max-w-md w-full overflow-hidden">
+            <div className="p-5 border-b border-surface-container-high flex items-center justify-between bg-emerald-50/50 dark:bg-emerald-950/20">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 flex items-center justify-center">
+                  <UserCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-serif font-bold text-emerald-950 dark:text-emerald-100">
+                    Reactivate Employee
+                  </h3>
+                  <p className="text-xs text-on-surface-variant">
+                    {employee.first_name} {employee.last_name} ({employee.employee_code})
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowReactivateModal(false)}
+                disabled={isActionLoading}
+                className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-3 text-xs">
+              <p className="text-on-surface leading-relaxed">
+                Reactivating this employee will restore their status to <strong>ACTIVE</strong> and re-enable their portal credentials so they can log in, punch attendance, and submit leave requests.
+              </p>
+              {actionError && (
+                <div className="p-3 bg-red-50 text-red-700 text-xs rounded-lg flex items-center space-x-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{actionError}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 bg-surface-container-low border-t border-surface-container-high flex items-center justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setShowReactivateModal(false)}
+                disabled={isActionLoading}
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmReactivate}
+                disabled={isActionLoading}
+                className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors flex items-center space-x-1.5 shadow-sm"
+              >
+                {isActionLoading ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Reactivating...</span>
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Confirm Reactivation</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

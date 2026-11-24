@@ -137,7 +137,16 @@ export const MobilePunchCard: React.FC = () => {
           (user?.email && e.email?.toLowerCase() === user.email.toLowerCase())
       );
 
-      if (!matchedEmp && employees.length > 0) {
+      // If user is a client admin or manager without an employee profile, auto-provision their profile
+      if (!matchedEmp && user && ['client_admin', 'client_manager', 'hr_admin'].includes(user.role)) {
+        const mgrRes = await employeeService.ensureManagerEmployeeProfile(user as any);
+        if (mgrRes.success && mgrRes.data) {
+          matchedEmp = mgrRes.data;
+        }
+      }
+
+      // Only fall back to first employee for regular employee preview mode
+      if (!matchedEmp && user?.role === 'employee' && employees.length > 0) {
         matchedEmp = employees[0];
       }
 

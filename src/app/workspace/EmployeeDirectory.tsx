@@ -26,7 +26,14 @@ import {
   AlertCircle,
   RefreshCw,
   ShieldAlert,
-  Edit3
+  Edit3,
+  UserX,
+  UserCheck,
+  AlertTriangle,
+  RotateCcw,
+  CheckCircle2,
+  X,
+  Loader2
 } from 'lucide-react';
 
 export const EmployeeDirectory: React.FC = () => {
@@ -65,6 +72,70 @@ export const EmployeeDirectory: React.FC = () => {
     clientId: userClientId,
     employeeId: userEmpId,
   }), [userRole, userClientId, userEmpId]);
+
+  // Employee Deletion / Access Revocation Modal State
+  const [employeeToDelete, setEmployeeToDelete] = useState<EmployeeRow | null>(null);
+  const [terminationReason, setTerminationReason] = useState('Resignation / Separation');
+  const [lastWorkingDay, setLastWorkingDay] = useState(new Date().toISOString().split('T')[0]);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
+
+  // Employee Reactivation Modal State
+  const [employeeToReactivate, setEmployeeToReactivate] = useState<EmployeeRow | null>(null);
+  const [isReactivating, setIsReactivating] = useState(false);
+
+  const handleConfirmDelete = async () => {
+    if (!employeeToDelete) return;
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await employeeService.deleteEmployee(
+        employeeToDelete.id,
+        { reason: terminationReason, lastWorkingDay },
+        callerScope
+      );
+      if (!res.success) {
+        setDeleteError(res.error?.message || 'Failed to remove employee.');
+        setIsDeleting(false);
+        return;
+      }
+      setActionSuccessMsg(
+        `Employee ${employeeToDelete.first_name} ${employeeToDelete.last_name} (${employeeToDelete.employee_code}) removed successfully. System login and ESS portal access revoked. Historical payrolls, payslips, and attendance muster remain fully retained.`
+      );
+      setEmployeeToDelete(null);
+      await loadData();
+      setTimeout(() => setActionSuccessMsg(null), 8000);
+    } catch (err: any) {
+      setDeleteError(err.message || 'An unexpected error occurred.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleConfirmReactivate = async () => {
+    if (!employeeToReactivate) return;
+    setIsReactivating(true);
+    setDeleteError(null);
+    try {
+      const res = await employeeService.reactivateEmployee(employeeToReactivate.id, callerScope);
+      if (!res.success) {
+        setDeleteError(res.error?.message || 'Failed to reactivate employee.');
+        setIsReactivating(false);
+        return;
+      }
+      setActionSuccessMsg(
+        `Employee ${employeeToReactivate.first_name} ${employeeToReactivate.last_name} (${employeeToReactivate.employee_code}) reactivated successfully. ESS portal login access restored.`
+      );
+      setEmployeeToReactivate(null);
+      await loadData();
+      setTimeout(() => setActionSuccessMsg(null), 8000);
+    } catch (err: any) {
+      setDeleteError(err.message || 'An unexpected error occurred.');
+    } finally {
+      setIsReactivating(false);
+    }
+  };
 
   const loadData = useCallback(async () => {
     if (!effectiveClientId) return;
@@ -169,6 +240,22 @@ export const EmployeeDirectory: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Action Success Toast */}
+      {actionSuccessMsg && (
+        <div className="p-4 bg-emerald-500/10 border border-emerald-500/25 rounded-xl flex items-center justify-between text-xs text-emerald-900 dark:text-emerald-300">
+          <div className="flex items-center space-x-2.5">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span className="font-semibold leading-relaxed">{actionSuccessMsg}</span>
+          </div>
+          <button
+            onClick={() => setActionSuccessMsg(null)}
+            className="p-1 text-emerald-700 hover:text-emerald-950 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Error Banner */}
       {errorMsg && (
@@ -417,29 +504,76 @@ export const EmployeeDirectory: React.FC = () => {
                       </td>
 
                       <td className="py-3 px-4">
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${statusColor}`}>
-                          {emp.status}
-                        </span>
+                        {emp.status === 'TERMINATED' ? (
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold border bg-red-100 text-red-800 border-red-300 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800 flex items-center space-x-1 w-fit">
+                            <UserX className="w-3 h-3 text-red-600 shrink-0" />
+                            <span>TERMINATED (Access Revoked)</span>
+                          </span>
+                        ) : (
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${statusColor}`}>
+                            {emp.status}
+                          </span>
+                        )}
                       </td>
 
                       <td className="py-3 px-4 text-right">
                         <div className="flex items-center justify-end space-x-1.5">
                           {canEdit && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                const targetUrl = routeClientId 
-                                  ? `/workspace/${routeClientId}/employees/${emp.id}?edit=true`
-                                  : `/workspace/${effectiveClientId}/employees/${emp.id}?edit=true`;
-                                navigate(targetUrl);
-                              }}
-                              title="Edit Employee Details"
-                              className="px-2.5 py-1 rounded-lg bg-surface-container-high hover:bg-primary/10 text-primary border border-primary/20 hover:border-primary/40 transition-colors flex items-center space-x-1 text-xs font-semibold cursor-pointer"
-                            >
-                              <Edit3 className="w-3.5 h-3.5" />
-                              <span className="hidden sm:inline">Edit</span>
-                            </button>
+                            <>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const targetUrl = routeClientId 
+                                    ? `/workspace/${routeClientId}/employees/${emp.id}?edit=true`
+                                    : `/workspace/${effectiveClientId}/employees/${emp.id}?edit=true`;
+                                  navigate(targetUrl);
+                                }}
+                                title="Edit Employee Details"
+                                className="px-2.5 py-1 rounded-lg bg-surface-container-high hover:bg-primary/10 text-primary border border-primary/20 hover:border-primary/40 transition-colors flex items-center space-x-1 text-xs font-semibold cursor-pointer"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Edit</span>
+                              </button>
+
+                              {emp.status !== 'TERMINATED' ? (
+                                <button
+                                  type="button"
+                                  disabled={emp.id === userEmpId}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (emp.id === userEmpId) return;
+                                    setEmployeeToDelete(emp);
+                                    setTerminationReason('Resignation / Separation');
+                                    setLastWorkingDay(new Date().toISOString().split('T')[0]);
+                                    setDeleteError(null);
+                                  }}
+                                  title={emp.id === userEmpId ? 'Cannot remove your own active profile' : 'Remove Employee & Revoke Access'}
+                                  className={`px-2 py-1 rounded-lg border transition-colors flex items-center space-x-1 text-xs font-semibold ${
+                                    emp.id === userEmpId
+                                      ? 'opacity-40 cursor-not-allowed bg-surface-container text-on-surface-variant border-surface-container-high'
+                                      : 'bg-red-50 hover:bg-red-100 text-red-700 border-red-200 dark:bg-red-950/30 dark:hover:bg-red-950/60 dark:text-red-300 dark:border-red-800 cursor-pointer'
+                                  }`}
+                                >
+                                  <UserX className="w-3.5 h-3.5" />
+                                  <span className="hidden sm:inline">Remove</span>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEmployeeToReactivate(emp);
+                                    setDeleteError(null);
+                                  }}
+                                  title="Reactivate Employee & Restore Portal Access"
+                                  className="px-2 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800 transition-colors flex items-center space-x-1 text-xs font-semibold cursor-pointer"
+                                >
+                                  <RotateCcw className="w-3.5 h-3.5" />
+                                  <span className="hidden sm:inline">Reactivate</span>
+                                </button>
+                              )}
+                            </>
                           )}
                           <span className="p-1 rounded-lg text-primary hover:bg-surface-container-high transition-colors inline-block">
                             <ChevronRight className="w-4 h-4" />
@@ -454,6 +588,196 @@ export const EmployeeDirectory: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Confirmation Modal: Remove Employee & Revoke System Access */}
+      {employeeToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-elevated border border-surface-container-high max-w-lg w-full overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-5 border-b border-surface-container-high flex items-center justify-between bg-red-50/50 dark:bg-red-950/20">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/50 text-red-600 flex items-center justify-center">
+                  <UserX className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-serif font-bold text-red-950 dark:text-red-100">
+                    Remove Employee & Revoke Access
+                  </h3>
+                  <p className="text-xs text-on-surface-variant">
+                    {employeeToDelete.first_name} {employeeToDelete.last_name} ({employeeToDelete.employee_code})
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEmployeeToDelete(null)}
+                disabled={isDeleting}
+                className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 space-y-4 text-xs">
+              {/* Statutory Compliance Notice Banner */}
+              <div className="p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-xl space-y-2">
+                <div className="flex items-center space-x-2 text-amber-900 dark:text-amber-200 font-bold">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>Statutory Compliance & Data Retention Guarantee</span>
+                </div>
+                <p className="text-amber-800 dark:text-amber-300 leading-relaxed text-[11px]">
+                  Under Indian labor laws (The Contract Labour Act 1970 Form XIX Wage Register, Minimum Wages Act, and EPF/ESIC statutory inspection rules), staff wage records are legally protected:
+                </p>
+                <ul className="list-disc list-inside space-y-1 text-amber-800/90 dark:text-amber-300/90 text-[11px]">
+                  <li><strong>Access Revocation:</strong> The employee’s login and active portal sessions will be terminated immediately. They will not be able to punch attendance or submit requests.</li>
+                  <li><strong>Complete Data Retention:</strong> All past payrolls, current payroll items, payslips, Form XIX registers, and attendance muster logs remain 100% accessible in the client directory and dashboard.</li>
+                </ul>
+              </div>
+
+              {/* Form Inputs */}
+              <div className="space-y-3 pt-1">
+                <div>
+                  <label className="block text-xs font-semibold text-on-surface mb-1">
+                    Termination Reason <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={terminationReason}
+                    onChange={e => setTerminationReason(e.target.value)}
+                    className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high font-medium text-xs focus:outline-none focus:border-red-500"
+                  >
+                    <option value="Resignation / Separation">Voluntary Resignation / Separation</option>
+                    <option value="Contract Completion">End of Fixed-Term Contract</option>
+                    <option value="Role Redundancy">Role Redundancy / Restructuring</option>
+                    <option value="Performance / Disciplinary">Performance / Disciplinary Action</option>
+                    <option value="Absconding / Job Abandonment">Absconding / Job Abandonment</option>
+                    <option value="Retirement">Statutory Retirement</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-on-surface mb-1">
+                    Last Working Day (LWD) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={lastWorkingDay}
+                    onChange={e => setLastWorkingDay(e.target.value)}
+                    className="w-full px-3 py-2 bg-surface-container-low rounded-lg border border-surface-container-high font-medium text-xs focus:outline-none focus:border-red-500"
+                  />
+                </div>
+              </div>
+
+              {deleteError && (
+                <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 text-red-700 text-xs rounded-lg flex items-center space-x-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{deleteError}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-surface-container-low border-t border-surface-container-high flex items-center justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setEmployeeToDelete(null)}
+                disabled={isDeleting}
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-colors flex items-center space-x-1.5 shadow-sm"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Revoking Access...</span>
+                  </>
+                ) : (
+                  <>
+                    <UserX className="w-3.5 h-3.5" />
+                    <span>Confirm Removal & Revoke Access</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal: Reactivate Employee */}
+      {employeeToReactivate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-elevated border border-surface-container-high max-w-md w-full overflow-hidden">
+            <div className="p-5 border-b border-surface-container-high flex items-center justify-between bg-emerald-50/50 dark:bg-emerald-950/20">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 flex items-center justify-center">
+                  <UserCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-serif font-bold text-emerald-950 dark:text-emerald-100">
+                    Reactivate Employee
+                  </h3>
+                  <p className="text-xs text-on-surface-variant">
+                    {employeeToReactivate.first_name} {employeeToReactivate.last_name} ({employeeToReactivate.employee_code})
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEmployeeToReactivate(null)}
+                disabled={isReactivating}
+                className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-3 text-xs">
+              <p className="text-on-surface leading-relaxed">
+                Reactivating this employee will restore their status to <strong>ACTIVE</strong> and re-enable their portal credentials so they can log in, punch attendance, and submit leave requests.
+              </p>
+              {deleteError && (
+                <div className="p-3 bg-red-50 text-red-700 text-xs rounded-lg flex items-center space-x-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{deleteError}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 bg-surface-container-low border-t border-surface-container-high flex items-center justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setEmployeeToReactivate(null)}
+                disabled={isReactivating}
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmReactivate}
+                disabled={isReactivating}
+                className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors flex items-center space-x-1.5 shadow-sm"
+              >
+                {isReactivating ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Reactivating...</span>
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Confirm Reactivation</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

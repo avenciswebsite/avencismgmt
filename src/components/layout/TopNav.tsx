@@ -14,7 +14,8 @@ import {
   Sparkles,
   CheckCircle2,
   AlertTriangle,
-  Menu
+  Menu,
+  Clock
 } from 'lucide-react';
 
 interface TopNavProps {
@@ -148,7 +149,30 @@ export const TopNav: React.FC<TopNavProps> = ({ onToggleMobileMenu }) => {
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-2 sm:space-x-3">
+        {/* Manager Portal / Workspace Quick Switch */}
+        {['client_admin', 'client_manager', 'hr_admin'].includes(currentUser?.role || '') && (
+          location.pathname.startsWith('/portal') ? (
+            <button
+              onClick={() => navigate(`/workspace/${activeClientId || currentUser?.clientId || ''}`)}
+              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-primary text-white hover:bg-primary-dark transition-all text-xs font-semibold shadow-sm"
+              title="Return to Client Workspace Management Console"
+            >
+              <Building2 className="w-3.5 h-3.5 text-accent-light" />
+              <span className="hidden sm:inline">Management Console</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate('/portal/punch')}
+              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-accent/15 text-primary hover:bg-accent/25 border border-accent/30 transition-all text-xs font-semibold shadow-sm"
+              title="Open My Punch & Attendance Portal"
+            >
+              <Clock className="w-3.5 h-3.5 text-accent" />
+              <span className="hidden sm:inline">My Attendance & Punch</span>
+            </button>
+          )
+        )}
+
         {/* Quick Change Password Button */}
         <button
           onClick={() => setIsPasswordModalOpen(true)}
@@ -225,6 +249,25 @@ export const TopNav: React.FC<TopNavProps> = ({ onToggleMobileMenu }) => {
 
               {/* Actions */}
               <div className="space-y-1 text-xs">
+                {['client_admin', 'client_manager', 'hr_admin'].includes(currentUser?.role || '') && (
+                  <button
+                    onClick={() => {
+                      setShowUserDropdown(false);
+                      if (location.pathname.startsWith('/portal')) {
+                        navigate(`/workspace/${activeClientId || currentUser?.clientId || ''}`);
+                      } else {
+                        navigate('/portal/punch');
+                      }
+                    }}
+                    className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-primary hover:bg-surface-container-low transition-colors text-left"
+                  >
+                    <Clock className="w-4 h-4 text-accent" />
+                    <span className="font-semibold">
+                      {location.pathname.startsWith('/portal') ? 'Management Console' : 'My Attendance & Punch'}
+                    </span>
+                  </button>
+                )}
+
                 <button
                   onClick={() => {
                     setShowUserDropdown(false);

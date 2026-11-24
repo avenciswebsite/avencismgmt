@@ -312,6 +312,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {isInClientWorkspace ? (
           /* Client Workspace Navigation */
           <>
+            {/* Manager Self-Service Quick Access */}
+            {['client_admin', 'client_manager', 'hr_admin'].includes(currentUser?.role || '') && (
+              <div className="mb-2 pb-2 border-b border-white/10">
+                <div className="px-3 pt-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-accent-light">
+                  Manager Self-Service
+                </div>
+                <NavLink
+                  to="/portal/punch"
+                  onClick={onCloseMobile}
+                  className={() => getNavItemClasses(path.startsWith('/portal'))}
+                >
+                  <Clock className={getIconClasses(path.startsWith('/portal'))} />
+                  <div className="flex items-center justify-between flex-1">
+                    <span>My Attendance & Punch</span>
+                    <span className="text-[9px] uppercase px-1.5 py-0.5 rounded bg-accent/30 text-white font-bold">ESS</span>
+                  </div>
+                </NavLink>
+              </div>
+            )}
+
             <div className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-white/40">
               Workspace Operations
             </div>

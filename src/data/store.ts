@@ -388,6 +388,54 @@ class AppStore {
     return newEmp;
   }
 
+  deleteEmployee(id: string, reason = 'Separation / Termination', lastWorkingDay?: string): Employee | undefined {
+    const emp = this.getEmployee(id);
+    if (!emp) return undefined;
+
+    emp.status = 'TERMINATED';
+    emp.lastWorkingDay = lastWorkingDay || new Date().toISOString().split('T')[0];
+    emp.terminationReason = reason;
+
+    // Deactivate linked user profile so all system access is revoked
+    const linkedUser = this.users.find(u => u.employeeId === id || (emp.email && u.email.toLowerCase() === emp.email.toLowerCase()));
+    if (linkedUser) {
+      (linkedUser as any).isActive = false;
+    }
+
+    this.logAction(
+      'EMPLOYEE_TERMINATION',
+      'Employee',
+      emp.id,
+      `Employee terminated and access revoked: ${emp.firstName} ${emp.lastName} (${emp.employeeCode}). Reason: ${reason}. Historical payroll and muster retained.`
+    );
+    this.saveToStorage();
+    return emp;
+  }
+
+  reactivateEmployee(id: string): Employee | undefined {
+    const emp = this.getEmployee(id);
+    if (!emp) return undefined;
+
+    emp.status = 'ACTIVE';
+    emp.lastWorkingDay = undefined;
+    emp.terminationReason = undefined;
+
+    // Reactivate linked user profile
+    const linkedUser = this.users.find(u => u.employeeId === id || (emp.email && u.email.toLowerCase() === emp.email.toLowerCase()));
+    if (linkedUser) {
+      (linkedUser as any).isActive = true;
+    }
+
+    this.logAction(
+      'EMPLOYEE_REACTIVATION',
+      'Employee',
+      emp.id,
+      `Employee reactivated and access restored: ${emp.firstName} ${emp.lastName} (${emp.employeeCode})`
+    );
+    this.saveToStorage();
+    return emp;
+  }
+
   // --- Attendance ---
   getAttendanceRecords(clientId?: string, date?: string): DailyAttendanceRecord[] {
     let records = this.attendanceRecords;

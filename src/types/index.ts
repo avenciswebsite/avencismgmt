@@ -150,6 +150,7 @@ export interface Employee {
   status: 'ACTIVE' | 'ON_NOTICE' | 'TERMINATED';
   managerId?: string;
   lastWorkingDay?: string;
+  terminationReason?: string;
   
   // Compensation
   fixedMonthlySalary: number;

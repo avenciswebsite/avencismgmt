@@ -270,6 +270,7 @@ export interface Database {
           avatar_url: string | null;
           manager_id?: string | null;
           last_working_day?: string | null;
+          termination_reason?: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -295,6 +296,7 @@ export interface Database {
           avatar_url?: string | null;
           manager_id?: string | null;
           last_working_day?: string | null;
+          termination_reason?: string | null;
           created_at?: string;
           updated_at?: string;
         };

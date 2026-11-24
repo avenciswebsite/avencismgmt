@@ -142,6 +142,21 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
       try {
         const res = await employeeService.getEmployees({ clientId: effectiveClientId });
         let rawList: any[] = res.data || [];
+
+        // If user is client admin or manager, ensure their own employee record exists
+        if (user && ['client_admin', 'client_manager', 'hr_admin'].includes(user.role)) {
+          const hasMatch = rawList.some(e => 
+            (user.employeeId && e.id === user.employeeId) ||
+            (user.email && e.email?.toLowerCase() === user.email.toLowerCase())
+          );
+          if (!hasMatch) {
+            const mgrRes = await employeeService.ensureManagerEmployeeProfile(user as any);
+            if (mgrRes.success && mgrRes.data) {
+              rawList.push(mgrRes.data);
+            }
+          }
+        }
+
         if (rawList.length === 0 && user?.employeeId) {
           const singleRes = await employeeService.getEmployeeById(user.employeeId);
           if (singleRes.data) {
@@ -163,15 +178,15 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
             designation: e.designation || 'Staff',
             joiningDate: (e as any).joining_date || (e as any).date_of_joining || new Date().toISOString().split('T')[0],
             employmentType: 'FULL_TIME',
-            status: 'ACTIVE',
+            status: e.status || 'ACTIVE',
             fixedMonthlySalary: Number((e as any).fixed_monthly_salary || 25000),
             variableIncentive: Number((e as any).variable_incentive || 0),
             otherAllowances: 0,
             bankName: (e as any).bank_name || 'HDFC Bank',
             accountNumber: (e as any).account_number || '000000000000',
             ifscCode: (e as any).ifsc_code || 'HDFC0000001',
-            panNumber: (e as any).pan || '',
-            aadhaarNumber: (e as any).aadhaar || '',
+            panNumber: (e as any).pan || (e as any).pan_number || '',
+            aadhaarNumber: (e as any).aadhaar || (e as any).aadhaar_number || '',
             uanNumber: (e as any).uan_number || '',
             esicNumber: (e as any).esic_number || '',
             avatarUrl: (e as any).avatar_url || '',
@@ -185,7 +200,7 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
     };
     fetchEmployees();
     return () => { isCancelled = true; };
-  }, [effectiveClientId, user?.employeeId, isLoadingWorkspace]);
+  }, [effectiveClientId, user?.employeeId, user?.email, user?.role, isLoadingWorkspace]);
 
   const currentEmp = useMemo(() => {
     if (user?.employeeId) {
@@ -196,8 +211,12 @@ export const EmployeePortal: React.FC<EmployeePortalProps> = ({ defaultTab = 'pu
       const match = employees.find(e => e.email?.toLowerCase() === user.email?.toLowerCase());
       if (match) return match;
     }
-    return employees[0];
-  }, [employees, user?.employeeId, user?.email]);
+    // Only fall back to first employee for regular employee preview mode
+    if (user?.role === 'employee' && employees.length > 0) {
+      return employees[0];
+    }
+    return null;
+  }, [employees, user?.employeeId, user?.email, user?.role]);
 
   const departmentName = currentEmp ? (departments.find(d => d.id === currentEmp.departmentId)?.name || 'Operations') : 'Operations';
   const todayAttendance = liveMuster ? {
